@@ -1,0 +1,7 @@
+*.swp
+*.swo
+*.sh
+sandbox
+tor-metrics/__pycache__
+tor-metrics/www
+tor-metrics/timestamp

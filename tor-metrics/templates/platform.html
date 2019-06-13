@@ -1,0 +1,4 @@
+{% extends "base.html" %}
+{% block title %}Tor Relays :: {{ relays[0]['platform'] }}{% endblock %}
+{% block header %}<a href="../../">Home</a> :: {{ relays[0]['platform'] }}{% endblock %}
+{% block description %}{{ relays[0]['platform'] }} systems are responsible for ~{{ bandwidth }} MB/s of traffic.{% endblock %}
