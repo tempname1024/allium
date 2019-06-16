@@ -1,4 +1,5 @@
-import os, json, requests, time
+import os, json, time, urllib.request
+from urllib.error import URLError, HTTPError
 import config
 
 abs_path = os.path.dirname(os.path.abspath(__file__))
@@ -16,21 +17,27 @@ class Relays:
             with open(self.ts_file, 'r') as ts_file:
                 prev_timestamp = ts_file.read()
             try:
-                api_response = requests.get(self.url,
+                conn = urllib.request.Request(self.url, 
                         headers={"If-Modified-Since": prev_timestamp})
-            except requests.exceptions.RequestException:
+                api_response = urllib.request.urlopen(conn).read()
+                self.statuscode = urllib.request.urlopen(conn).getcode()
+            except HTTPError as e:
+                self.statuscode = e.code
+                return(None)
+            except URLError as e:
                 return(None)
         else:
             try:
-                api_response = requests.get(self.url)
-            except requests.exceptions.RequestException:
+                conn = urllib.request.Request(self.url)
+                api_response = urllib.request.urlopen(conn).read()
+                self.statuscode = urllib.request.urlopen(conn).getcode()
+            except HTTPError as e:
+                self.statuscode = e.code
+                return(None)
+            except URLError as e:
                 return(None)
         
-        self.statuscode = api_response.status_code
-        if self.statuscode != 200:
-            return(None)
-        
-        json_data = api_response.json()
+        json_data = json.loads(api_response.decode('utf-8'))
         sorted_json = self.sort_by_bandwidth(json_data)
         trimmed_json = self.trim_platform(sorted_json)
         return(trimmed_json)

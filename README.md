@@ -4,7 +4,7 @@ Network-oriented Tor metrics and statistics made with love (not javascript).
 
 * No javascript
 * Static HTML/CSS generation at runtime
-* Minimal library dependence (jinja2, requests)
+* Minimal library dependence (jinja2)
 * Sort by ASN, country, and platform
 * Respectful Onionoo queries (If-Modified-Since)
 
