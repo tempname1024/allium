@@ -21,11 +21,6 @@ def generate_html(relays):
         static_dest_path = os.path.join(config.CONFIG['output_root'], 'static')
         if not os.path.exists(static_dest_path):
             copytree(static_src_path, static_dest_path)
-    else:
-        if relays.statuscode == 304:
-            print('HTTP 304 response, no modification since last fetch')
-        else:
-            print('API request could not be completed')
 
 def unsorted(relays, filename, is_index):
     template_env = env.get_template(filename)

@@ -6,7 +6,6 @@ abs_path = os.path.dirname(os.path.abspath(__file__))
 
 class Relays:
     def __init__(self):
-        self.statuscode = None
         self.url = config.CONFIG['onionoo_url']
         self.ts_file = os.path.join(abs_path, "timestamp")
         self.json = self.fetch()
@@ -16,26 +15,16 @@ class Relays:
         if os.path.isfile(self.ts_file):
             with open(self.ts_file, 'r') as ts_file:
                 prev_timestamp = ts_file.read()
-            try:
-                conn = urllib.request.Request(self.url,
-                        headers={"If-Modified-Since": prev_timestamp})
-                api_response = urllib.request.urlopen(conn).read()
-                self.statuscode = urllib.request.urlopen(conn).getcode()
-            except HTTPError as e:
-                self.statuscode = e.code
-                return(None)
-            except URLError as e:
-                return(None)
+            headers = {"If-Modified-Since": prev_timestamp}
+            conn = urllib.request.Request(self.url, headers=headers)
         else:
-            try:
-                conn = urllib.request.Request(self.url)
-                api_response = urllib.request.urlopen(conn).read()
-                self.statuscode = urllib.request.urlopen(conn).getcode()
-            except HTTPError as e:
-                self.statuscode = e.code
-                return(None)
-            except URLError as e:
-                return(None)
+            conn = urllib.request.Request(self.url)
+
+        try:
+            api_response = urllib.request.urlopen(conn).read()
+        except Exception as e:
+            print(e)
+            return(None)
 
         json_data = json.loads(api_response.decode('utf-8'))
         sorted_json = self.sort_by_bandwidth(json_data)
