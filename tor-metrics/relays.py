@@ -17,7 +17,7 @@ class Relays:
             with open(self.ts_file, 'r') as ts_file:
                 prev_timestamp = ts_file.read()
             try:
-                conn = urllib.request.Request(self.url, 
+                conn = urllib.request.Request(self.url,
                         headers={"If-Modified-Since": prev_timestamp})
                 api_response = urllib.request.urlopen(conn).read()
                 self.statuscode = urllib.request.urlopen(conn).getcode()
@@ -36,7 +36,7 @@ class Relays:
                 return(None)
             except URLError as e:
                 return(None)
-        
+
         json_data = json.loads(api_response.decode('utf-8'))
         sorted_json = self.sort_by_bandwidth(json_data)
         trimmed_json = self.trim_platform(sorted_json)

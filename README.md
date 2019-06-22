@@ -8,6 +8,16 @@ Network-oriented Tor metrics and statistics made with love (not javascript).
 * Sort by ASN, country, and platform
 * Respectful Onionoo queries (If-Modified-Since)
 
+```bash
+# Requirements: python3, jinja2 (pip install jinja2)
+
+git clone https://github.com/tempname1024/tor-metrics.git
+cd tor-metrics/tor-metrics
+python3 generate.py
+
+# Files are written to www/ by default
+```
+
 ```
 TODO:
 - Per-relay page generation (display contact, exit policy, etc)
