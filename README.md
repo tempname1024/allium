@@ -20,10 +20,11 @@ python3 generate.py
 
 ```
 TODO:
-- Per-relay page generation (display contact, exit policy, etc)
-- Sort by effective family, show member count globally
-- Interesting statistics (ASN exit concentration, IPv6-supporting relays, etc)
-- Neat network-related graphs
+* Per-relay page generation (display contact, exit policy, etc)
+* Sort by effective family, show member count globally
+* Top exit/guard/relay families (see https://nusenu.github.io/OrNetStats/)
+* Interesting statistics (ASN exit concentration, IPv6-supporting relays, etc)
+* Implement something similar to https://metrics.torproject.org/bubbles.html
 ```
 
 This project includes country flags by [GoSquared](https://github.com/gosquared/flags) and relay flags by the [Tor Project](https://www.torproject.org/).
