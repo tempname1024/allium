@@ -21,7 +21,6 @@ python3 generate.py
 ```
 TODO:
 * Per-relay page generation (display contact, exit policy, etc)
-* Sort by effective family, show member count globally
 * Top exit/guard/relay families (see https://nusenu.github.io/OrNetStats/)
 * Interesting statistics (ASN exit concentration, IPv6-supporting relays, etc)
 * Implement something similar to https://metrics.torproject.org/bubbles.html

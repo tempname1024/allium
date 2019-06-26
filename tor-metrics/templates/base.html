@@ -36,11 +36,14 @@
                         {% else %}
                         {% set obs_bandwidth = '%s %s'|format((relay['observed_bandwidth'] / 1000)|round(2, 'common'), 'KB/s') %}{% endif %}
 
-                        <td>{{ relay['nickname'] }}</td>
+                        {% if category != 'family' %}
+                        <td>{{ relay['nickname'] }} (<a href="{{ path_prefix }}family/{{ relay['effective_family'][0] }}/">{{ relay['effective_family']|length }}</a>)</td>
+                        {% else %}
+                        <td>{{ relay['nickname'] }}</td>{% endif %}
                         <td>{{ obs_bandwidth }}</td>
                         <td class="visible-md visible-lg">{{ relay['or_addresses'][0].split(':', 1)[0] }}</td>
 
-                        {% if relay['as'] %}{% if deactivate != 'as' %}
+                        {% if relay['as'] %}{% if focused != 'as' %}
                         <td><a href="{{ path_prefix }}as/{{ relay['as'] }}/">{{ relay['as'] }}</a></td>
                         {% else %}
                         <td>{{ relay['as'] }}</td>{% endif %}
@@ -52,14 +55,14 @@
                         {% else %}
                         <td>Unknown</td>{% endif %}
                         
-                        {% if relay['country'] %}{% if deactivate != 'country' %}
+                        {% if relay['country'] %}{% if focused != 'country' %}
                         <td><a href="{{ path_prefix }}country/{{ relay['country'] }}/"><img src="{{ path_prefix }}static/images/cc/{{ relay['country'] }}.png" title="{{ relay['country_name'] }}" alt="{{ relay['country_name'] }}"></a></td>
                         {% else %}
                         <td><img src="{{ path_prefix }}static/images/cc/{{ relay['country'] }}.png" title="{{ relay['country_name'] }}" alt="{{ relay['country_name'] }}"></td>{% endif %}
                         {% else %}
                         <td>X</td>{% endif %}
                         
-                        {% if deactivate != 'platform' %}
+                        {% if focused != 'platform' %}
                         <td><a href="{{ path_prefix }}platform/{{ relay['platform'] }}/">{{ relay['platform'] }}</a></td>
                         {% else %}
                         <td>{{ relay['platform'] }}</td>{% endif %}
