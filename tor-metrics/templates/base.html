@@ -36,11 +36,10 @@
                         {% else %}
                         {% set obs_bandwidth = '%s %s'|format((relay['observed_bandwidth'] / 1000)|round(2, 'common'), 'KB/s') %}{% endif %}
 
-                        {% if category != 'family' %}
-                        {% if relay['effective_family']|length > 1 %}
+                        {% if category != 'family' and relay['effective_family']|length > 1 %}
                         <td>{{ relay['nickname'] }} (<a href="{{ path_prefix }}family/{{ relay['effective_family'][0] }}/">{{ relay['effective_family']|length }}</a>)</td>
                         {% else %}
-                        <td>{{ relay['nickname'] }}</td>{% endif %}{% endif %}
+                        <td>{{ relay['nickname'] }}</td>{% endif %}
                         <td>{{ obs_bandwidth }}</td>
                         <td class="visible-md visible-lg">{{ relay['or_addresses'][0].split(':', 1)[0] }}</td>
 
