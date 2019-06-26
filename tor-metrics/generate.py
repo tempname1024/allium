@@ -33,6 +33,8 @@ def unsorted(relays, filename, is_index):
 def effective_family(relays):
     template = env.get_template('effective_family.html')
     output_path = os.path.join(config.CONFIG['output_root'], 'family')
+    if os.path.exists(output_path):
+        rmtree(output_path)
     relay_list = relays.json['relays']
     q_relays = [] # qualified relays w/ > 1 effective family member
     for relay in relay_list:
