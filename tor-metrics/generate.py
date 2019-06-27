@@ -27,8 +27,8 @@ def unsorted(relays, filename, is_index):
     template = env.get_template(filename)
     template_render = template.render(relays=relays, is_index=is_index)
     output = os.path.join(config.CONFIG['output_root'], filename)
-    with open(output, 'w', encoding='utf8') as out:
-        out.write(template_render)
+    with open(output, 'w', encoding='utf8') as html:
+        html.write(template_render)
 
 def effective_family(relays):
     template = env.get_template('effective_family.html')
@@ -48,8 +48,15 @@ def effective_family(relays):
             if fingerprint in p_relay['effective_family']:
                 members.append(p_relay)
                 bandwidth += p_relay['observed_bandwidth']
-        write(output_path, members, bandwidth, template, fingerprint, 
-                category='family')
+        dir_path = os.path.join(output_path, fingerprint)
+        os.makedirs(dir_path)
+        f_bandwidth = round(bandwidth / 1000000, 2) # convert to MB/s
+        rendered = template.render(relays=members, bandwidth=f_bandwidth,
+                is_index=False, path_prefix='../../', deactivate='family',
+                family=fingerprint)
+        with open(os.path.join(dir_path, 'index.html'), 'w',
+                encoding='utf8') as html:
+            html.write(rendered)
 
 def pages_by_key(relays, key):
     template = env.get_template(key + '.html')
@@ -68,18 +75,15 @@ def pages_by_key(relays, key):
                 if p_relay.get(key) and p_relay[key] == relay[key]:
                     found_relays.append(p_relay)
                     bandwidth += p_relay['observed_bandwidth']
-            write(output_path, found_relays, bandwidth, template, relay[key])
-
-def write(parent_dir, relays, bandwidth, template, key, category=None):
-    dir_path = os.path.join(parent_dir, key)
-    os.makedirs(dir_path)
-    f_bandwidth = round(bandwidth / 1000000, 2) # convert to MB/s
-    rendered = template.render(relays=relays, bandwidth=f_bandwidth,
-            focused=key, is_index=False, category=category, path_prefix='../../',
-            special_countries=countries.the_prefixed)
-    with open(os.path.join(dir_path, 'index.html'), 'w', encoding='utf8') as html:
-        html.write(rendered)
-
+            dir_path = os.path.join(output_path, relay[key])
+            os.makedirs(dir_path)
+            f_bandwidth = round(bandwidth / 1000000, 2) # convert to MB/s
+            rendered = template.render(relays=found_relays,
+                    bandwidth=f_bandwidth, is_index=False, path_prefix='../../',
+                    deactivate=key, special_countries=countries.the_prefixed)
+            with open(os.path.join(dir_path, 'index.html'), 'w',
+                    encoding='utf8') as html:
+                html.write(rendered)
 
 relays = Relays()
 generate_html(relays)
