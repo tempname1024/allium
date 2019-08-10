@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "relay-list.html" %}
 {% block title %}Tor Relays :: {{ relays[0]['as'] }}{% endblock %}
 {% block header %}<a href="../../">Home</a> :: {{ relays[0]['as'] }}{% endblock %}
 {% block description %}{{ relays[0]['as'] }} ({{ relays[0]['as_name']}}) is responsible for ~{{ bandwidth }} MB/s of traffic.{% endblock %}

@@ -1,12 +1,6 @@
 # Tor Metrics :: [yui.cat](https://yui.cat/) source
 
-Network-oriented Tor metrics and statistics made with love (not javascript).
-
-* No javascript
-* Static HTML/CSS generation at runtime
-* Minimal library dependence (jinja2)
-* Sort by ASN, country, and platform
-* Respectful Onionoo queries (If-Modified-Since)
+Network-oriented Tor metrics and statistics made with love (not javascript)
 
 ```bash
 # Requirements: python3, jinja2 (pip install jinja2)
@@ -20,7 +14,6 @@ python3 generate.py
 
 ```
 TODO:
-* Per-relay page generation (display contact, exit policy, etc)
 * Top exit/guard/relay families (see https://nusenu.github.io/OrNetStats/)
 * Interesting statistics (ASN exit concentration, IPv6-supporting relays, etc)
 * Implement something similar to https://metrics.torproject.org/bubbles.html

@@ -18,6 +18,7 @@ def generate_html(relays):
         effective_family(relays)
         unsorted(relays, 'index.html', is_index=True)
         unsorted(relays.json['relays'], 'all.html', is_index=False)
+        relay_info(relays)
         static_src_path = os.path.join(abs_path, 'static')
         static_dest_path = os.path.join(config.CONFIG['output_root'], 'static')
         if not os.path.exists(static_dest_path):
@@ -84,6 +85,21 @@ def pages_by_key(relays, key):
             with open(os.path.join(dir_path, 'index.html'), 'w',
                     encoding='utf8') as html:
                 html.write(rendered)
+
+def relay_info(relays):
+    template = env.get_template('relay-info.html')
+    output_path = os.path.join(config.CONFIG['output_root'], 'relay')
+    if os.path.exists(output_path):
+        rmtree(output_path)
+    os.makedirs(output_path)
+    relay_list = relays.json['relays']
+    for relay in relay_list:
+        rendered = template.render(relay=relay, path_prefix='../')
+        with open(os.path.join(output_path, '%s.html' % relay['fingerprint']),
+                'w', encoding='utf8') as html:
+            html.write(rendered)
+
+
 
 relays = Relays()
 generate_html(relays)

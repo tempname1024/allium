@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "relay-list.html" %}
 {% block title %}Tor Relays{% endblock %}
 {% block header %}Tor Metrics (<a href="http://d6amkx45augz4kskvjryv3bmmwyf7vw4k3uwxsh5egnibw2igl5aozqd.onion/">v3</a>, <a href="https://github.com/tempname1024/tor-metrics">git</a>){% endblock %}
 {% block description %}Relay listings are statically generated every hour. Last fetch was at {{ relays.timestamp }}. Listing top 500 relays; <a href="all.html">view full list</a>.{% endblock %}

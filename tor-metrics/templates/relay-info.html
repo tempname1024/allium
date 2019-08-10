@@ -1,0 +1,171 @@
+{% extends "skeleton.html" %}
+{% block title %}Tor Relays :: {{ relay['nickname'] }}{% endblock %}
+{% block body %}
+<div id="content">
+<h2><a href="{{ path_prefix }}">Home</a> :: Relay "{{ relay['nickname'] }}"</h2>
+<div class="row">
+    <div class="col-md-6">
+        <dl>
+            <dt>Nickname</dt>
+            <dd>{{ relay['nickname'] }}</dd>
+
+            <dt>OR Address</dt>
+            <dd><pre class="pre-scrollable">{% for address in relay['or_addresses'] -%}
+                {{ address }}
+            {% endfor -%}
+            </pre></dd>
+
+            <dt>Contact</dt>
+            {% if relay['contact'] %}
+                <dd>{{ relay['contact'] }}</dd>
+            {% else %}
+                <dd>none</dd>
+            {% endif %}
+
+            <dt>Dir Address</dt>
+            {% if relay['dir_address'] %}
+                <dd>{{ relay['dir_address'] }}</dd>
+            {% else %}
+                <dd>none</dd>
+            {% endif %}
+
+            <dt>Exit Address</dt>
+            {% if relay['exit_address'] %}
+                <dd>{{ relay['exit_address'] }}</dd>
+            {% else %}
+                <dd>none</dd>
+            {% endif %}
+
+            <dt>Observed Bandwidth</dt>
+            {% if relay['observed_bandwidth'] > 1000000 %}
+            {% set obs_bandwidth = '%s %s'|format((relay['observed_bandwidth'] / 1000000)|round(2, 'common'), 'MB/s') %}
+            {% else %}
+            {% set obs_bandwidth = '%s %s'|format((relay['observed_bandwidth'] / 1000)|round(2, 'common'), 'KB/s') %}{% endif %}
+            <dd>{{ obs_bandwidth }}</dd>
+
+            <dt>IPv4 Exit Policy Summary</dt>
+            <dd>
+            {% if relay['exit_policy_summary'] -%}
+                {%- set v4_summary = relay['exit_policy_summary'].items() -%}
+                <pre class="pre-scrollable">{% for key, value in v4_summary -%}
+                    {{ key }}: {{ value[0] }}
+                {% endfor -%}
+                </pre>
+            {% else -%}
+                <pre>none</pre>
+            {% endif -%}
+            </dd>
+
+            <dt>IPv6 Exit Policy Summary</dt>
+            <dd>
+            {% if relay['exit_policy_v6_summary'] -%}
+                {%- set v6_summary = relay['exit_policy_v6_summary'].items() -%}
+                <pre class="pre-scrollable">{% for key, value in v6_summary -%}
+                    {{ key }}: {{ value[0] }}
+                {% endfor -%}
+                </pre>
+            {% else -%}
+                <pre>none</pre>
+            {% endif -%}
+            </dd>
+
+            <dt>Exit Policy</dt>
+            <dd><pre class="pre-scrollable">{% for policy in relay['exit_policy'] -%}
+                {{ policy }}
+            {% endfor -%}
+            </pre></dd>
+
+            {% if relay['effective_family']|length > 1 -%}
+                <dt>Effective Family Members (<a href="{{ path_prefix }}family/{{ relay['fingerprint'] }}">view</a>)</dt>
+            {% else %}
+                <dt>Effective Family Members</dt>
+            {% endif %}
+            <dd><pre class="pre-scrollable">{% for e_relay in relay['effective_family'] -%}
+                {% if relay['effective_family']|length > 1 -%}
+                <a href="{{ e_relay }}.html">{{ e_relay }}</a>
+                {% else -%}
+                {{ e_relay }}
+                {% endif -%}
+            {% endfor -%}
+            </pre></dd>
+
+            <dt>Alleged Family Members</dt>
+            <dd>
+            {% if relay['alleged_family'] %}
+                <pre class="pre-scrollable">{% for a_relay in relay['alleged_family'] -%}
+                    {% if relay['alleged_family']|length > 1 -%}
+                    <a href="{{ a_relay }}.html">{{ a_relay }}</a>
+                    {% else -%}
+                    {{ a_relay }}
+                    {% endif -%}
+                {% endfor %}
+            {% else -%}
+                <pre class="pre-scrollable">none
+            {% endif -%}
+            </pre></dd>
+        </dl>
+    </div>
+    <div class="col-md-6">
+        <dl>
+            <dt>Fingerprint</dt>
+            <dd><pre>{{ relay['fingerprint'] }}</pre></dd>
+
+            <dt>Flags</dt>
+            <dd>
+            {% for flag in relay['flags'] %}
+                {% if flag != 'StaleDesc' %}
+                <img src="{{ path_prefix}}static/images/flags/{{ flag.lower() }}.png" title="{{ flag }}" alt="{{ flag }}"> {{ flag }}
+                {% endif %}
+            {% endfor %}
+            </dd>
+
+            <dt>Host Name</dt>
+            <dd>
+            {% if relay['verified_host_names'] -%}
+                <pre>{{ relay['verified_host_names'][0] }}</pre>
+            {% else -%}
+                <pre>none</pre>
+            {% endif -%}
+
+            <dt>Country</dt>
+            <dd>
+            {% if relay['country'] -%}
+                <a href="{{ path_prefix }}country/{{ relay['country'] }}/"><img src="{{ path_prefix }}static/images/cc/{{ relay['country'] }}.png" title="{{ relay['country_name'] }}" alt="{{ relay['country_name'] }}"></a> {{ relay['country_name'] }}
+            {% else -%}
+                unknown
+            {% endif %}
+            </dd>
+
+            <dt>AS Number</dt>
+            <dd>
+            {% if relay['as'] %}
+                <a href='{{ path_prefix }}as/{{ relay['as'] }}'>{{ relay['as'] }}</a>
+            {% else %}
+                unknown
+            {% endif %}
+
+            <dt>AS Name</dt>
+            <dd>
+            {% if relay['as_name'] -%}
+                {{ relay['as_name'] }} (<a href='https://bgp.he.net/{{ relay['as'] }}'>BGP</a>)
+            {% else -%}
+                unknown
+            {% endif -%}
+
+            <dt>First Seen</dt>
+            <dd>{{ relay['first_seen'] }}</dd>
+
+            <dt>Last Restarted</dt>
+            <dd>{{ relay['last_restarted'] }}</dd>
+
+            <dt>Consensus Weight</dt>
+            <dd>{{ relay['consensus_weight_fraction'] }} ({{ relay['consensus_weight'] }})</dd>
+
+            <dt>Platform</dt>
+            <dd>{{ relay['platform'] }}</dd>
+
+        </dl>
+    </div>
+</div>
+</div>
+{% endblock %}

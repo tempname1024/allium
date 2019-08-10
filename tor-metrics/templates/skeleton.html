@@ -1,0 +1,21 @@
+{% block head %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{% block title %}{% endblock %}</title>
+    <meta name="description" content="Javascript-free Tor metrics generated from an hourly API request.">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ path_prefix }}static/css/bootstrap.min.css">
+</head>
+{% endblock %}
+<body>
+<div class="container">
+{% block body %}
+{% endblock %}
+<p>Country flags provided by <a href="https://github.com/gosquared/flags">GoSquared</a>, relay flags by the <a href="https://gitweb.torproject.org/metrics-web.git/">Tor Project</a>.</p>
+</div>
+</body>
+{% block footer %}
+</html>
+{% endblock %}
