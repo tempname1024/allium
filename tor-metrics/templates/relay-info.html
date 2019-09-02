@@ -17,7 +17,7 @@
 
             <dt>Contact</dt>
             {% if relay['contact'] %}
-                <dd>{{ relay['contact'] }}</dd>
+                <dd>{{ relay['contact']|escape }}</dd>
             {% else %}
                 <dd>none</dd>
             {% endif %}
