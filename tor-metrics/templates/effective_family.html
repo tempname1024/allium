@@ -1,4 +1,4 @@
 {% extends "relay-list.html" %}
-{% block title %}Tor Relays :: Family {{ family }}{% endblock %}
-{% block header %}<a href="../../">Home</a> :: Family {{ family }}{% endblock %}
-{% block description %}Relays with effective family member {{ family }} are responsible for ~{{ bandwidth }} MB/s of traffic.{% endblock %}
+{% block title %}Tor Relays :: Family {{ family|escape }}{% endblock %}
+{% block header %}<a href="../../">Home</a> :: Family {{ family|escape }}{% endblock %}
+{% block description %}Relays with effective family member {{ family|escape }} are responsible for ~{{ bandwidth }} MB/s of traffic.{% endblock %}

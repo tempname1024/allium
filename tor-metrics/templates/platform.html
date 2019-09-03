@@ -1,4 +1,4 @@
 {% extends "relay-list.html" %}
-{% block title %}Tor Relays :: {{ relays[0]['platform'] }}{% endblock %}
-{% block header %}<a href="../../">Home</a> :: {{ relays[0]['platform'] }}{% endblock %}
-{% block description %}{{ relays[0]['platform'] }} systems are responsible for ~{{ bandwidth }} MB/s of traffic.{% endblock %}
+{% block title %}Tor Relays :: {{ relays[0]['platform']|escape }}{% endblock %}
+{% block header %}<a href="../../">Home</a> :: {{ relays[0]['platform']|escape }}{% endblock %}
+{% block description %}{{ relays[0]['platform']|escape }} systems are responsible for ~{{ bandwidth }} MB/s of traffic.{% endblock %}

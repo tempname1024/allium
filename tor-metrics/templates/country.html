@@ -1,9 +1,9 @@
 {% extends "relay-list.html" %}
 {% if relays[0]['country_name'] in special_countries %}
-    {% set country_name = 'The ' + relays[0]['country_name'] %}
+    {% set country_name = 'The ' + relays[0]['country_name']|escape %}
 {% else %}
-    {% set country_name = relays[0]['country_name'] %}
+    {% set country_name = relays[0]['country_name']|escape %}
 {% endif %}
-{% block title %}Tor Relays :: {{ relays[0]['country_name'] }}{% endblock %}
-{% block header %}<a href="../../">Home</a> :: {{ relays[0]['country_name'] }}{% endblock %}
-{% block description %}{{ country_name }} ({{ relays[0]['country'] }}) is responsible for ~{{ bandwidth }} MB/s of traffic.{% endblock %}
+{% block title %}Tor Relays :: {{ relays[0]['country_name']|escape }}{% endblock %}
+{% block header %}<a href="../../">Home</a> :: {{ relays[0]['country_name']|escape }}{% endblock %}
+{% block description %}{{ country_name }} ({{ relays[0]['country']|escape }}) is responsible for ~{{ bandwidth }} MB/s of traffic.{% endblock %}
