@@ -147,7 +147,7 @@
             <dt>AS Name</dt>
             <dd>
             {% if relay['as_name'] -%}
-                {{ relay['as_name']|escape }} (<a href='https://bgp.he.net/{{ relay['as']|escape }}'>bgp</a>)
+                {{ relay['as_name']|escape }} (<a href='https://bgp.he.net/{{ relay['as']|escape }}'>BGP</a>)
             {% else -%}
                 unknown
             {% endif -%}

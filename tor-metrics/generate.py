@@ -1,16 +1,34 @@
 #!/usr/bin/env python3
 
-from jinja2 import Environment, FileSystemLoader
-from shutil import rmtree, copytree
-from relays import Relays
-import os, json
-import config, countries
+'''
+File: generate.py (executable)
 
-abs_path = os.path.dirname(os.path.abspath(__file__))
-env = Environment(loader=FileSystemLoader(os.path.join(abs_path, 'templates')),
-        trim_blocks=True, lstrip_blocks=True)
+Generate complete set of relay HTML pages and copy static files to
+config.CONFIG['output_root'] defined in config.py
+
+Default output directory: ./www
+'''
+
+import os
+from shutil import rmtree, copytree
+import config
+import countries
+from jinja2 import Environment, FileSystemLoader
+from relays import Relays
+
+ABS_PATH = os.path.dirname(os.path.abspath(__file__))
+ENV = Environment(loader=FileSystemLoader(os.path.join(ABS_PATH, 'templates')),
+                  trim_blocks=True, lstrip_blocks=True)
 
 def generate_html(relays):
+    '''
+    Render and write complete set of relay pages to disk by calling each group's
+    respective function
+
+    Files are written to 'www' by default (defined in config.py)
+
+    :relays: relays class object containing relay set (list of dict)
+    '''
     if relays.json is not None:
         pages_by_key(relays, 'as')
         pages_by_key(relays, 'country')
@@ -19,20 +37,32 @@ def generate_html(relays):
         unsorted(relays, 'index.html', is_index=True)
         unsorted(relays.json['relays'], 'all.html', is_index=False)
         relay_info(relays)
-        static_src_path = os.path.join(abs_path, 'static')
+        static_src_path = os.path.join(ABS_PATH, 'static')
         static_dest_path = os.path.join(config.CONFIG['output_root'], 'static')
         if not os.path.exists(static_dest_path):
             copytree(static_src_path, static_dest_path)
 
 def unsorted(relays, filename, is_index):
-    template = env.get_template(filename)
+    '''
+    Render and write unsorted HTML listings to disk
+
+    :relays: relays class object containing relay set (list of dict)
+    :filename: filename to write unsorted listing (e.g. all.html)
+    :is_index: whether the file is an index or not (True/False)
+    '''
+    template = ENV.get_template(filename)
     template_render = template.render(relays=relays, is_index=is_index)
     output = os.path.join(config.CONFIG['output_root'], filename)
     with open(output, 'w', encoding='utf8') as html:
         html.write(template_render)
 
 def effective_family(relays):
-    template = env.get_template('effective_family.html')
+    '''
+    Render and write HTML listings to disk sorted by effective family
+
+    :relays: relays class object containing relay set (list of dict)
+    '''
+    template = ENV.get_template('effective_family.html')
     output_path = os.path.join(config.CONFIG['output_root'], 'family')
     if os.path.exists(output_path):
         rmtree(output_path)
@@ -53,14 +83,20 @@ def effective_family(relays):
         os.makedirs(dir_path)
         f_bandwidth = round(bandwidth / 1000000, 2) # convert to MB/s
         rendered = template.render(relays=members, bandwidth=f_bandwidth,
-                is_index=False, path_prefix='../../', deactivate='family',
-                family=fingerprint)
+                                   is_index=False, path_prefix='../../',
+                                   deactivate='family', family=fingerprint)
         with open(os.path.join(dir_path, 'index.html'), 'w',
-                encoding='utf8') as html:
+                  encoding='utf8') as html:
             html.write(rendered)
 
 def pages_by_key(relays, key):
-    template = env.get_template(key + '.html')
+    '''
+    Render and write HTML listings to disk sorted by KEY
+
+    :relays: relays class object containing relay set (list of dict)
+    :key: onionoo JSON parameter to sort by, e.g. 'platform'
+    '''
+    template = ENV.get_template(key + '.html')
     output_path = os.path.join(config.CONFIG['output_root'], key)
     if os.path.exists(output_path):
         rmtree(output_path)
@@ -80,14 +116,20 @@ def pages_by_key(relays, key):
             os.makedirs(dir_path)
             f_bandwidth = round(bandwidth / 1000000, 2) # convert to MB/s
             rendered = template.render(relays=found_relays,
-                    bandwidth=f_bandwidth, is_index=False, path_prefix='../../',
-                    deactivate=key, special_countries=countries.the_prefixed)
+                                       bandwidth=f_bandwidth, is_index=False,
+                                       path_prefix='../../', deactivate=key,
+                                       special_countries=countries.THE_PREFIXED)
             with open(os.path.join(dir_path, 'index.html'), 'w',
-                    encoding='utf8') as html:
+                      encoding='utf8') as html:
                 html.write(rendered)
 
 def relay_info(relays):
-    template = env.get_template('relay-info.html')
+    '''
+    Render and write per-relay HTML info documents to disk
+
+    :relays: relays class object containing relay set (list of dict)
+    '''
+    template = ENV.get_template('relay-info.html')
     output_path = os.path.join(config.CONFIG['output_root'], 'relay')
     if os.path.exists(output_path):
         rmtree(output_path)
@@ -96,11 +138,8 @@ def relay_info(relays):
     for relay in relay_list:
         rendered = template.render(relay=relay, path_prefix='../')
         with open(os.path.join(output_path, '%s.html' % relay['fingerprint']),
-                'w', encoding='utf8') as html:
+                  'w', encoding='utf8') as html:
             html.write(rendered)
 
-
-
-relays = Relays()
-generate_html(relays)
-
+RELAY_SET = Relays()
+generate_html(RELAY_SET)

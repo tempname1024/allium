@@ -1,6 +1,10 @@
-# list of countries that require "The" prefix
+'''
+File: countries.py
 
-the_prefixed = [
+List of countries which require prefixing with "The"
+'''
+
+THE_PREFIXED = [
         'Dominican Republic',
         'Ivory Coast',
         'Marshall Islands',
