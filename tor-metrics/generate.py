@@ -73,6 +73,8 @@ def effective_family(relays):
             q_relays.append(relay)
     for relay in q_relays:
         fingerprint = relay['fingerprint']
+        if not fingerprint.isalnum():
+            continue
         members = []   # list of member relays (dict)
         bandwidth = 0  # total bandwidth for family subset
         for p_relay in q_relays:
@@ -112,6 +114,8 @@ def pages_by_key(relays, key):
                 if p_relay.get(key) and p_relay[key] == relay[key]:
                     found_relays.append(p_relay)
                     bandwidth += p_relay['observed_bandwidth']
+            if not relay[key].isalnum():
+                continue
             dir_path = os.path.join(output_path, relay[key])
             os.makedirs(dir_path)
             f_bandwidth = round(bandwidth / 1000000, 2) # convert to MB/s
@@ -136,6 +140,8 @@ def relay_info(relays):
     os.makedirs(output_path)
     relay_list = relays.json['relays']
     for relay in relay_list:
+        if not relay['fingerprint'].isalnum():
+            continue
         rendered = template.render(relay=relay, path_prefix='../')
         with open(os.path.join(output_path, '%s.html' % relay['fingerprint']),
                   'w', encoding='utf8') as html:
