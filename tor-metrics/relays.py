@@ -54,7 +54,8 @@ class Relays:
             print('Uncaught exception during onionoo fetch: %s' % err)
 
         json_data = json.loads(api_response.decode('utf-8'))
-        sorted_json = self.sort_by_bandwidth(json_data)
+        fixed_bw = self.fix_missing_observed_bandwidth(json_data)
+        sorted_json = self.sort_by_bandwidth(fixed_bw)
         trimmed_json = self.trim_platform(sorted_json)
         return trimmed_json
 
@@ -69,12 +70,29 @@ class Relays:
             relay['platform'] = relay['platform'].split(' on ', 1)[1].split(' ')[0]
         return json_data
 
+    def fix_missing_observed_bandwidth(self, json_data):
+        '''
+        Set the observed_bandwidth parameter value for any relay missing the
+        parameter to 0; the observed_bandwidth parameter is (apparently)
+        optional, I hadn't run into an instance of it missing until 2019-10-03
+
+        "[...] Missing if router descriptor containing this information cannot be
+        found."
+        --https://metrics.torproject.org/onionoo.html#details_relay_observed_bandwidth
+
+        '''
+        for idx, relay in enumerate(json_data['relays']):
+            if not relay.get('observed_bandwidth'):
+                json_data['relays'][idx]['observed_bandwidth'] = 0
+        return json_data
+
     def sort_by_bandwidth(self, json_data):
         '''
         Sort full JSON list by highest observed_bandwidth, retain this order
         during subsequent sorting (country, AS, etc)
         '''
-        json_data['relays'].sort(key=lambda x: x['observed_bandwidth'], reverse=True)
+        json_data['relays'].sort(key=lambda x: x['observed_bandwidth'],
+                                 reverse=True)
         return json_data
 
     def write_timestamp(self):
@@ -83,7 +101,8 @@ class Relays:
         to onionoo via If-Modified-Since header during fetch() if exists
         '''
         timestamp = time.time()
-        f_timestamp = time.strftime('%a, %d %b %Y %H:%M:%S GMT', time.gmtime(timestamp))
+        f_timestamp = time.strftime('%a, %d %b %Y %H:%M:%S GMT',
+                                    time.gmtime(timestamp))
         if self.json is not None:
             with open(self.ts_file, 'w', encoding='utf8') as ts_file:
                 ts_file.write(f_timestamp)
