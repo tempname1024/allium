@@ -29,18 +29,19 @@ def generate_html(relays):
 
     :relays: relays class object containing relay set (list of dict)
     '''
-    if relays.json is not None:
-        pages_by_key(relays, 'as')
-        pages_by_key(relays, 'country')
-        pages_by_key(relays, 'platform')
-        effective_family(relays)
-        unsorted(relays, 'index.html', is_index=True)
-        unsorted(relays.json['relays'], 'all.html', is_index=False)
-        relay_info(relays)
-        static_src_path = os.path.join(ABS_PATH, 'static')
-        static_dest_path = os.path.join(config.CONFIG['output_root'], 'static')
-        if not os.path.exists(static_dest_path):
-            copytree(static_src_path, static_dest_path)
+    if relays.json is None:
+        return
+    pages_by_key(relays, 'as')
+    pages_by_key(relays, 'country')
+    pages_by_key(relays, 'platform')
+    effective_family(relays)
+    unsorted(relays, 'index.html', is_index=True)
+    unsorted(relays.json['relays'], 'all.html', is_index=False)
+    relay_info(relays)
+    static_src_path = os.path.join(ABS_PATH, 'static')
+    static_dest_path = os.path.join(config.CONFIG['output_root'], 'static')
+    if not os.path.exists(static_dest_path):
+        copytree(static_src_path, static_dest_path)
 
 def unsorted(relays, filename, is_index):
     '''
@@ -107,25 +108,26 @@ def pages_by_key(relays, key):
     for idx, relay in enumerate(relay_list):
         found_relays = []
         bandwidth = 0 # total bandwidth for relay subset
-        if relay.get(key) and relay[key] not in values_processed:
-            values_processed.append(relay[key])
-            # find relays w/ matching value past outer idx
-            for p_relay in relay_list[idx:]:
-                if p_relay.get(key) and p_relay[key] == relay[key]:
-                    found_relays.append(p_relay)
-                    bandwidth += p_relay['observed_bandwidth']
-            if not relay[key].isalnum():
-                continue
-            dir_path = os.path.join(output_path, relay[key])
-            os.makedirs(dir_path)
-            f_bandwidth = round(bandwidth / 1000000, 2) # convert to MB/s
-            rendered = template.render(relays=found_relays,
-                                       bandwidth=f_bandwidth, is_index=False,
-                                       path_prefix='../../', deactivate=key,
-                                       special_countries=countries.THE_PREFIXED)
-            with open(os.path.join(dir_path, 'index.html'), 'w',
-                      encoding='utf8') as html:
-                html.write(rendered)
+        if not relay.get(key) or relay[key] in values_processed:
+            continue
+        if not relay[key].isalnum():
+            continue
+        values_processed.append(relay[key])
+        # find relays w/ matching value past outer idx
+        for p_relay in relay_list[idx:]:
+            if p_relay.get(key) and p_relay[key] == relay[key]:
+                found_relays.append(p_relay)
+                bandwidth += p_relay['observed_bandwidth']
+        dir_path = os.path.join(output_path, relay[key])
+        os.makedirs(dir_path)
+        f_bandwidth = round(bandwidth / 1000000, 2) # convert to MB/s
+        rendered = template.render(relays=found_relays,
+                                   bandwidth=f_bandwidth, is_index=False,
+                                   path_prefix='../../', deactivate=key,
+                                   special_countries=countries.THE_PREFIXED)
+        with open(os.path.join(dir_path, 'index.html'), 'w',
+                  encoding='utf8') as html:
+            html.write(rendered)
 
 def relay_info(relays):
     '''

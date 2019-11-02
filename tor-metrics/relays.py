@@ -52,6 +52,7 @@ class Relays:
             return None
         except Exception as err:
             print('Uncaught exception during onionoo fetch: %s' % err)
+            return None
 
         json_data = json.loads(api_response.decode('utf-8'))
         fixed_bw = self.fix_missing_observed_bandwidth(json_data)
