@@ -114,7 +114,7 @@
             <dd>
             {% for flag in relay['flags'] %}
                 {% if flag != 'StaleDesc' %}
-                <img src="{{ path_prefix}}static/images/flags/{{ flag.lower()|escape }}.png" title="{{ flag|escape }}" alt="{{ flag|escape }}"> {{ flag|escape }}
+                <a href="{{ path_prefix }}flag/{{ flag.lower()|escape }}"><img src="{{ path_prefix}}static/images/flags/{{ flag.lower()|escape }}.png" title="{{ flag|escape }}" alt="{{ flag|escape }}"></a> {{ flag|escape }}
                 {% endif %}
             {% endfor %}
             </dd>

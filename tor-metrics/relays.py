@@ -69,6 +69,7 @@ class Relays:
         '''
         for relay in json_data['relays']:
             relay['platform'] = relay['platform'].split(' on ', 1)[1].split(' ')[0]
+            relay['platform'] = relay['platform'].split('/')[-1] # GNU/*
         return json_data
 
     def fix_missing_observed_bandwidth(self, json_data):

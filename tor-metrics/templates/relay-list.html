@@ -54,9 +54,9 @@
             <td>X</td>{% endif %}
 
             {% if deactivate != 'platform' %}
-            <td><a href="{{ path_prefix }}platform/{{ relay['platform']|escape }}/">{{ relay['platform']|escape }}</a></td>
+            <td><a href="{{ path_prefix }}platform/{{ relay['platform']|escape }}/">{{ relay['platform']|truncate(length=10)|escape }}</a></td>
             {% else %}
-            <td>{{ relay['platform']|escape }}</td>{% endif %}
+            <td>{{ relay['platform']|truncate(length=10)|escape }}</td>{% endif %}
 
             <td>{% for flag in relay['flags'] %}{% if flag != 'StaleDesc' %}<a href="{{ path_prefix }}flag/{{ flag.lower()|escape }}"><img src="{{ path_prefix}}static/images/flags/{{ flag.lower()|escape }}.png" title="{{ flag|escape }}" alt="{{ flag|escape }}"></a> {% endif %}{% endfor %}</td>
 
