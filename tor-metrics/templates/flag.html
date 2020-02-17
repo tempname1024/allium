@@ -1,0 +1,4 @@
+{% extends "relay-list.html" %}
+{% block title %}Tor Relays :: {{ flag|escape }} Flag{% endblock %}
+{% block header %}<a href="../../">Home</a> :: {{ flag|escape }}{% endblock %}
+{% block description %}Relays with the {{ flag }} flag are responsible for ~{{ bandwidth }} MB/s of traffic.{% endblock %}

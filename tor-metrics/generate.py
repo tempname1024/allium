@@ -35,6 +35,7 @@ def generate_html(relays):
     pages_by_key(relays, 'country')
     pages_by_key(relays, 'platform')
     effective_family(relays)
+    pages_by_flag(relays)
     unsorted(relays, 'index.html', is_index=True)
     unsorted(relays.json['relays'], 'all.html', is_index=False)
     relay_info(relays)
@@ -126,6 +127,41 @@ def pages_by_key(relays, key):
                                    path_prefix='../../', deactivate=key,
                                    special_countries=countries.THE_PREFIXED)
         with open(os.path.join(dir_path, 'index.html'), 'w',
+                  encoding='utf8') as html:
+            html.write(rendered)
+
+def pages_by_flag(relays):
+    '''
+    Render and write HTML listings to disk sorted by FLAG
+
+    :relays: relays class object containing relay set (list of dict)
+    :flag: onionoo JSON relay flag to sort by, e.g. 'exit'
+    '''
+    FLAGS = ['Exit','Fast','Guard','HSDir','Running','Stable','V2Dir','Valid',
+             'Authority']
+    template = ENV.get_template('flag.html')
+    for flag in FLAGS:
+        output_path = os.path.join(config.CONFIG['output_root'], 'flag',
+                                   flag.lower())
+        if os.path.exists(output_path):
+            rmtree(output_path)
+        relay_list = relays.json['relays']
+        found_relays = []
+        bandwidth = 0 # total bandwidth for relay subset
+        for idx, relay in enumerate(relay_list):
+            if not relay.get('flags'):
+                continue
+            if flag in relay['flags']:
+                found_relays.append(relay)
+                bandwidth += relay['observed_bandwidth']
+        os.makedirs(output_path)
+        f_bandwidth = round(bandwidth / 1000000, 2) # convert to MB/s
+        rendered = template.render(relays=found_relays,
+                                   bandwidth=f_bandwidth, is_index=False,
+                                   path_prefix='../../', deactivate=flag,
+                                   special_countries=countries.THE_PREFIXED,
+                                   flag=flag)
+        with open(os.path.join(output_path, 'index.html'), 'w',
                   encoding='utf8') as html:
             html.write(rendered)
 

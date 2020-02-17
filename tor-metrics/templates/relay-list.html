@@ -58,7 +58,7 @@
             {% else %}
             <td>{{ relay['platform']|escape }}</td>{% endif %}
 
-            <td>{% for flag in relay['flags'] %}{% if flag != 'StaleDesc' %}<img src="{{ path_prefix}}static/images/flags/{{ flag.lower()|escape }}.png" title="{{ flag|escape }}" alt="{{ flag|escape }}"> {% endif %}{% endfor %}</td>
+            <td>{% for flag in relay['flags'] %}{% if flag != 'StaleDesc' %}<a href="{{ path_prefix }}flag/{{ flag.lower()|escape }}"><img src="{{ path_prefix}}static/images/flags/{{ flag.lower()|escape }}.png" title="{{ flag|escape }}" alt="{{ flag|escape }}"></a> {% endif %}{% endfor %}</td>
 
             {% if relay['running'] %}
             <td class="visible-md visible-lg"><font color="green">True</font></td>
