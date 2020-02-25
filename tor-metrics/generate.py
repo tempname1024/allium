@@ -37,7 +37,7 @@ def generate_html(relays):
     effective_family(relays)
     pages_by_flag(relays)
     unsorted(relays, 'index.html', is_index=True)
-    unsorted(relays.json['relays'], 'all.html', is_index=False)
+    unsorted(relays, 'all.html', is_index=False)
     relay_info(relays)
     static_src_path = os.path.join(ABS_PATH, 'static')
     static_dest_path = os.path.join(config.CONFIG['output_root'], 'static')
@@ -53,6 +53,7 @@ def unsorted(relays, filename, is_index):
     :is_index: whether the file is an index or not (True/False)
     '''
     template = ENV.get_template(filename)
+    relays.json['relay_subset'] = relays.json['relays']
     template_render = template.render(relays=relays, is_index=is_index)
     output = os.path.join(config.CONFIG['output_root'], filename)
     with open(output, 'w', encoding='utf8') as html:
@@ -86,7 +87,8 @@ def effective_family(relays):
         dir_path = os.path.join(output_path, fingerprint)
         os.makedirs(dir_path)
         f_bandwidth = round(bandwidth / 1000000, 2) # convert to MB/s
-        rendered = template.render(relays=members, bandwidth=f_bandwidth,
+        relays.json['relay_subset'] = members
+        rendered = template.render(relays=relays, bandwidth=f_bandwidth,
                                    is_index=False, path_prefix='../../',
                                    deactivate='family', family=fingerprint)
         with open(os.path.join(dir_path, 'index.html'), 'w',
@@ -122,7 +124,8 @@ def pages_by_key(relays, key):
         dir_path = os.path.join(output_path, relay[key])
         os.makedirs(dir_path)
         f_bandwidth = round(bandwidth / 1000000, 2) # convert to MB/s
-        rendered = template.render(relays=found_relays,
+        relays.json['relay_subset'] = found_relays
+        rendered = template.render(relays=relays,
                                    bandwidth=f_bandwidth, is_index=False,
                                    path_prefix='../../', deactivate=key,
                                    special_countries=countries.THE_PREFIXED)
@@ -135,7 +138,6 @@ def pages_by_flag(relays):
     Render and write HTML listings to disk sorted by FLAG
 
     :relays: relays class object containing relay set (list of dict)
-    :flag: onionoo JSON relay flag to sort by, e.g. 'exit'
     '''
     FLAGS = ['Exit','Fast','Guard','HSDir','Running','Stable','V2Dir','Valid',
              'Authority']
@@ -156,7 +158,8 @@ def pages_by_flag(relays):
                 bandwidth += relay['observed_bandwidth']
         os.makedirs(output_path)
         f_bandwidth = round(bandwidth / 1000000, 2) # convert to MB/s
-        rendered = template.render(relays=found_relays,
+        relays.json['relay_subset'] = found_relays
+        rendered = template.render(relays=relays,
                                    bandwidth=f_bandwidth, is_index=False,
                                    path_prefix='../../', deactivate=flag,
                                    special_countries=countries.THE_PREFIXED,
@@ -171,16 +174,17 @@ def relay_info(relays):
 
     :relays: relays class object containing relay set (list of dict)
     '''
+    relay_list = relays.json['relays']
     template = ENV.get_template('relay-info.html')
     output_path = os.path.join(config.CONFIG['output_root'], 'relay')
     if os.path.exists(output_path):
         rmtree(output_path)
     os.makedirs(output_path)
-    relay_list = relays.json['relays']
     for relay in relay_list:
         if not relay['fingerprint'].isalnum():
             continue
-        rendered = template.render(relay=relay, path_prefix='../')
+        rendered = template.render(relay=relay, path_prefix='../',
+                                   relays=relays)
         with open(os.path.join(output_path, '%s.html' % relay['fingerprint']),
                   'w', encoding='utf8') as html:
             html.write(rendered)

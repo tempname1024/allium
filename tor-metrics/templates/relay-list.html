@@ -17,8 +17,8 @@
         <th class="visible-md visible-lg">First Seen</th>
     </tr>
     <tbody>
-        {% if is_index %}{% set relay_list = relays.json['relays'][:500] %}
-        {% else %}{% set relay_list = relays %}{% endif %}
+        {% if is_index %}{% set relay_list = relays.json['relay_subset'][:500] %}
+        {% else %}{% set relay_list = relays.json['relay_subset'] %}{% endif %}
         {% for relay in relay_list %}
         <tr>
             {% if relay['observed_bandwidth'] > 1000000 %}
