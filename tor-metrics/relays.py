@@ -42,17 +42,7 @@ class Relays:
         else:
             conn = urllib.request.Request(self.url)
 
-        try:
-            api_response = urllib.request.urlopen(conn).read()
-        except HTTPError as err:
-            print('HTTPError caught during onionoo fetch: %s' % err)
-            return None
-        except URLError as err:
-            print('URLError caught during onionoo fetch: %s' % err)
-            return None
-        except Exception as err:
-            print('Uncaught exception during onionoo fetch: %s' % err)
-            return None
+        api_response = urllib.request.urlopen(conn).read()
 
         json_data = json.loads(api_response.decode('utf-8'))
         fixed_bw = self.fix_missing_observed_bandwidth(json_data)

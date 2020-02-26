@@ -1,23 +1,25 @@
-Tor Metrics :: https://yui.cat/ source
-* Relay listings statically generated at runtime
-* Sort by family, ASN, country, and platform
-* Respectful Onionoo requests (If-Modified-Since)
-* Javascript-free
+tor-metrics: statically generated tor metrics and statistics
 
-TODO:
-* Top exit/guard/relay families (see https://nusenu.github.io/OrNetStats/)
-* Interesting statistics (ASN exit concentration, IPv6-supporting relays)
-* Implement something similar to https://metrics.torproject.org/bubbles.html
-* Generalize sorting functions, avoid redundancy
+  tor-metrics generates a set of HTML documents which represent the total set
+  of tor relays at runtime, sorting by ASN/country/platform/flag, respectful
+  Onionoo queries (If-Modified-Since) and 100% certified Javascript-free™
 
-INSTALL:
-Requirements: python3, jinja2 (pip install jinja2)
+  demo: https://yui.cat/
 
-git clone https://github.com/tempname1024/tor-metrics.git
-cd tor-metrics/tor-metrics
-python3 generate.py
+  $ ./generate.py
+  $ ls ./www
+  all.html  as  country  family  flag  index.html  platform  relay  static
+  $
 
-Files are written to www/ by default
+  TODO
+  - top exit/guard/relay families (see https://nusenu.github.io/OrNetStats/)
+  - interesting statistics (ASN exit concentration, IPv6-supporting relays)
+  - implement something similar to https://metrics.torproject.org/bubbles.html
+  - generalize sorting functions, avoid redundancy
 
-This project includes country flags from https://github.com/gosquared/flags and
-relay flags from https://www.torproject.org/
+  note: this project includes country flags from GoSquared[0] and relay flags
+  from the Tor Project[1]; licenses are included in this project's root
+  directory
+
+  [0] https://github.com/gosquared/flags
+  [1] https://www.torproject.org/

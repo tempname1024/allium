@@ -10,6 +10,7 @@ Default output directory: ./www
 '''
 
 import os
+import sys
 from shutil import rmtree, copytree
 import config
 import countries
@@ -29,8 +30,6 @@ def generate_html(relays):
 
     :relays: relays class object containing relay set (list of dict)
     '''
-    if relays.json is None:
-        return
     pages_by_key(relays, 'as')
     pages_by_key(relays, 'country')
     pages_by_key(relays, 'platform')
@@ -189,5 +188,11 @@ def relay_info(relays):
                   'w', encoding='utf8') as html:
             html.write(rendered)
 
-RELAY_SET = Relays()
+try:
+    RELAY_SET = Relays()
+except Exception as err:
+    print('error fetching relay set from onionoo, aborting...')
+    print(err)
+    sys.exit()
+
 generate_html(RELAY_SET)
