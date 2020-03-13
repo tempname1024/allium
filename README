@@ -15,7 +15,6 @@ tor-metrics: statically generated tor metrics and statistics
   - top exit/guard/relay families (see https://nusenu.github.io/OrNetStats/)
   - interesting statistics (ASN exit concentration, IPv6-supporting relays)
   - implement something similar to https://metrics.torproject.org/bubbles.html
-  - generalize sorting functions, avoid redundancy
 
   note: this project includes country flags from GoSquared[0] and relay flags
   from the Tor Project[1]; licenses are included in this project's root

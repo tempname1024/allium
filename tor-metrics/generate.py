@@ -30,11 +30,12 @@ def generate_html(relays):
 
     :relays: relays class object containing relay set (list of dict)
     '''
+    sort_relays(relays)
     pages_by_key(relays, 'as')
     pages_by_key(relays, 'country')
     pages_by_key(relays, 'platform')
-    effective_family(relays)
     pages_by_flag(relays)
+    effective_family(relays)
     unsorted(relays, 'index.html', is_index=True)
     unsorted(relays, 'all.html', is_index=False)
     relay_info(relays)
@@ -42,6 +43,61 @@ def generate_html(relays):
     static_dest_path = os.path.join(config.CONFIG['output_root'], 'static')
     if not os.path.exists(static_dest_path):
         copytree(static_src_path, static_dest_path)
+
+def sort_relays(relays):
+    '''
+    Add a list of dict sorted by unique keys derived from relays as they're
+    discovered, referenced by indice to the main set (relays.json['relays'])
+
+    :relays: relays class object containing relay set (list of dict)
+    '''
+    keys = ['as', 'country', 'platform']
+    if not relays.json.get('sorted'):
+        relays.json['sorted'] = dict()
+
+    relay_list = relays.json['relays']
+    for idx, relay in enumerate(relay_list):
+        for key in keys:
+            v = relay.get(key)
+            if not v or not v.isalnum(): continue
+            if not key in relays.json['sorted']:
+                relays.json['sorted'][key] = dict()
+            if not v in relays.json['sorted'][key]:
+                relays.json['sorted'][key][v] = dict()
+                relays.json['sorted'][key][v]['relays'] = list()
+                relays.json['sorted'][key][v]['bw'] = 0
+            if idx not in relays.json['sorted'][key][v]['relays']:
+                bw = relay['observed_bandwidth']
+                relays.json['sorted'][key][v]['relays'].append(idx)
+                relays.json['sorted'][key][v]['bw'] += bw
+
+        flags = relay['flags']
+        for flag in flags:
+            if not flag.isalnum(): continue
+            if not 'flags' in relays.json['sorted']:
+                relays.json['sorted']['flags'] = dict()
+            if not flag in relays.json['sorted']['flags']:
+                relays.json['sorted']['flags'][flag] = dict()
+                relays.json['sorted']['flags'][flag]['relays'] = list()
+                relays.json['sorted']['flags'][flag]['bw'] = 0
+            if idx not in relays.json['sorted']['flags'][flag]['relays']:
+                bw = relay['observed_bandwidth']
+                relays.json['sorted']['flags'][flag]['relays'].append(idx)
+                relays.json['sorted']['flags'][flag]['bw'] += bw
+
+        members = relay['effective_family']
+        for member in members:
+            if not member.isalnum() or len(v) < 2: continue
+            if not 'family' in relays.json['sorted']:
+                relays.json['sorted']['family'] = dict()
+            if not member in relays.json['sorted']['family']:
+                relays.json['sorted']['family'][member] = dict()
+                relays.json['sorted']['family'][member]['relays'] = list()
+                relays.json['sorted']['family'][member]['bw'] = 0
+            if idx not in relays.json['sorted']['family'][member]['relays']:
+                bw = relay['observed_bandwidth']
+                relays.json['sorted']['family'][member]['relays'].append(idx)
+                relays.json['sorted']['family'][member]['bw'] += bw
 
 def unsorted(relays, filename, is_index):
     '''
@@ -69,27 +125,18 @@ def effective_family(relays):
     if os.path.exists(output_path):
         rmtree(output_path)
     relay_list = relays.json['relays']
-    q_relays = [] # qualified relays w/ > 1 effective family member
-    for relay in relay_list:
-        if len(relay['effective_family']) > 1:
-            q_relays.append(relay)
-    for relay in q_relays:
-        fingerprint = relay['fingerprint']
-        if not fingerprint.isalnum():
-            continue
-        members = []   # list of member relays (dict)
-        bandwidth = 0  # total bandwidth for family subset
-        for p_relay in q_relays:
-            if fingerprint in p_relay['effective_family']:
-                members.append(p_relay)
-                bandwidth += p_relay['observed_bandwidth']
-        dir_path = os.path.join(output_path, fingerprint)
+    for family in relays.json['sorted']['family']:
+        members = []
+        bandwidth = relays.json['sorted']['family'][family]['bw']
+        for m_relay in relays.json['sorted']['family'][family]['relays']:
+            members.append(relay_list[m_relay])
+        dir_path = os.path.join(output_path, family)
         os.makedirs(dir_path)
         f_bandwidth = round(bandwidth / 1000000, 2) # convert to MB/s
         relays.json['relay_subset'] = members
         rendered = template.render(relays=relays, bandwidth=f_bandwidth,
                                    is_index=False, path_prefix='../../',
-                                   deactivate='family', family=fingerprint)
+                                   deactivate='family', family=family)
         with open(os.path.join(dir_path, 'index.html'), 'w',
                   encoding='utf8') as html:
             html.write(rendered)
@@ -99,31 +146,23 @@ def pages_by_key(relays, key):
     Render and write HTML listings to disk sorted by KEY
 
     :relays: relays class object containing relay set (list of dict)
-    :key: onionoo JSON parameter to sort by, e.g. 'platform'
+    :key: relays['sorted'] key (onionoo parameter) containing list of indices
+          belonging to key
     '''
     template = ENV.get_template(key + '.html')
     output_path = os.path.join(config.CONFIG['output_root'], key)
     if os.path.exists(output_path):
         rmtree(output_path)
     relay_list = relays.json['relays']
-    values_processed = [] # record values we've already processed
-    for idx, relay in enumerate(relay_list):
-        found_relays = []
-        bandwidth = 0 # total bandwidth for relay subset
-        if not relay.get(key) or relay[key] in values_processed:
-            continue
-        if not relay[key].isalnum():
-            continue
-        values_processed.append(relay[key])
-        # find relays w/ matching value past outer idx
-        for p_relay in relay_list[idx:]:
-            if p_relay.get(key) and p_relay[key] == relay[key]:
-                found_relays.append(p_relay)
-                bandwidth += p_relay['observed_bandwidth']
-        dir_path = os.path.join(output_path, relay[key])
+    for v in relays.json['sorted'][key]:
+        m_relays = list()
+        for idx in relays.json['sorted'][key][v]['relays']:
+            m_relays.append(relays.json['relays'][idx])
+        bandwidth = relays.json['sorted'][key][v]['bw']
+        dir_path = os.path.join(output_path, v)
         os.makedirs(dir_path)
         f_bandwidth = round(bandwidth / 1000000, 2) # convert to MB/s
-        relays.json['relay_subset'] = found_relays
+        relays.json['relay_subset'] = m_relays
         rendered = template.render(relays=relays,
                                    bandwidth=f_bandwidth, is_index=False,
                                    path_prefix='../../', deactivate=key,
@@ -138,26 +177,20 @@ def pages_by_flag(relays):
 
     :relays: relays class object containing relay set (list of dict)
     '''
-    FLAGS = ['Exit','Fast','Guard','HSDir','Running','Stable','V2Dir','Valid',
-             'Authority']
     template = ENV.get_template('flag.html')
-    for flag in FLAGS:
+    for flag in relays.json['sorted']['flags']:
         output_path = os.path.join(config.CONFIG['output_root'], 'flag',
                                    flag.lower())
         if os.path.exists(output_path):
             rmtree(output_path)
         relay_list = relays.json['relays']
-        found_relays = []
-        bandwidth = 0 # total bandwidth for relay subset
-        for idx, relay in enumerate(relay_list):
-            if not relay.get('flags'):
-                continue
-            if flag in relay['flags']:
-                found_relays.append(relay)
-                bandwidth += relay['observed_bandwidth']
+        m_relays = list()
+        for idx in relays.json['sorted']['flags'][flag]['relays']:
+            m_relays.append(relays.json['relays'][idx])
+        bandwidth = relays.json['sorted']['flags'][flag]['bw']
         os.makedirs(output_path)
         f_bandwidth = round(bandwidth / 1000000, 2) # convert to MB/s
-        relays.json['relay_subset'] = found_relays
+        relays.json['relay_subset'] = m_relays
         rendered = template.render(relays=relays,
                                    bandwidth=f_bandwidth, is_index=False,
                                    path_prefix='../../', deactivate=flag,
@@ -188,11 +221,12 @@ def relay_info(relays):
                   'w', encoding='utf8') as html:
             html.write(rendered)
 
-try:
-    RELAY_SET = Relays()
-except Exception as err:
-    print('error fetching relay set from onionoo, aborting...')
-    print(err)
-    sys.exit()
+if __name__ == '__main__':
+    try:
+        RELAY_SET = Relays()
+    except Exception as err:
+        print('error creating relays object from onionoo response, aborting...')
+        print(err)
+        sys.exit()
 
-generate_html(RELAY_SET)
+    generate_html(RELAY_SET)
