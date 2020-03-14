@@ -87,7 +87,7 @@ def sort_relays(relays):
 
         members = relay['effective_family']
         for member in members:
-            if not member.isalnum() or len(v) < 2: continue
+            if not member.isalnum() or len(members) < 2: continue
             if not 'family' in relays.json['sorted']:
                 relays.json['sorted']['family'] = dict()
             if not member in relays.json['sorted']['family']:
