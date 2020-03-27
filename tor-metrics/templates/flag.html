@@ -1,4 +1,4 @@
 {% extends "relay-list.html" %}
 {% block title %}Tor Relays :: {{ flag|escape }} Relays{% endblock %}
 {% block header %}<a href="../../">Home</a> :: {{ flag|escape }} Relays{% endblock %}
-{% block description %}Relays with the {{ flag }} flag are responsible for ~{{ bandwidth }} MB/s of traffic.{% endblock %}
+{% block description %}Relays with the {{ flag }} flag are responsible for ~{{ bandwidth }} MB/s of traffic, consisting of {% if middle_count > 0 %}{{ middle_count }} middle relay{% if middle_count > 1 %}s{% endif %}{% if exit_count > 0 %} and {% endif %}{% endif %}{% if exit_count > 0 %}{{ exit_count }} exit relay{% if exit_count > 1 %}s{% endif %}{% endif %}.{% endblock %}

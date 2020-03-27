@@ -66,10 +66,15 @@ def sort_relays(relays):
                 relays.json['sorted'][key][v] = dict()
                 relays.json['sorted'][key][v]['relays'] = list()
                 relays.json['sorted'][key][v]['bw'] = 0
-            if idx not in relays.json['sorted'][key][v]['relays']:
-                bw = relay['observed_bandwidth']
-                relays.json['sorted'][key][v]['relays'].append(idx)
-                relays.json['sorted'][key][v]['bw'] += bw
+                relays.json['sorted'][key][v]['exit_count'] = 0
+                relays.json['sorted'][key][v]['middle_count'] = 0
+            bw = relay['observed_bandwidth']
+            relays.json['sorted'][key][v]['relays'].append(idx)
+            relays.json['sorted'][key][v]['bw'] += bw
+            if 'Exit' in relay['flags']:
+                relays.json['sorted'][key][v]['exit_count'] += 1
+            else:
+                relays.json['sorted'][key][v]['middle_count'] += 1
 
         flags = relay['flags']
         for flag in flags:
@@ -80,10 +85,15 @@ def sort_relays(relays):
                 relays.json['sorted']['flags'][flag] = dict()
                 relays.json['sorted']['flags'][flag]['relays'] = list()
                 relays.json['sorted']['flags'][flag]['bw'] = 0
-            if idx not in relays.json['sorted']['flags'][flag]['relays']:
-                bw = relay['observed_bandwidth']
-                relays.json['sorted']['flags'][flag]['relays'].append(idx)
-                relays.json['sorted']['flags'][flag]['bw'] += bw
+                relays.json['sorted']['flags'][flag]['exit_count'] = 0
+                relays.json['sorted']['flags'][flag]['middle_count'] = 0
+            bw = relay['observed_bandwidth']
+            relays.json['sorted']['flags'][flag]['relays'].append(idx)
+            relays.json['sorted']['flags'][flag]['bw'] += bw
+            if 'Exit' in relay['flags']:
+                relays.json['sorted']['flags'][flag]['exit_count'] += 1
+            else:
+                relays.json['sorted']['flags'][flag]['middle_count'] += 1
 
         members = relay['effective_family']
         for member in members:
@@ -94,10 +104,15 @@ def sort_relays(relays):
                 relays.json['sorted']['family'][member] = dict()
                 relays.json['sorted']['family'][member]['relays'] = list()
                 relays.json['sorted']['family'][member]['bw'] = 0
-            if idx not in relays.json['sorted']['family'][member]['relays']:
-                bw = relay['observed_bandwidth']
-                relays.json['sorted']['family'][member]['relays'].append(idx)
-                relays.json['sorted']['family'][member]['bw'] += bw
+                relays.json['sorted']['family'][member]['exit_count'] = 0
+                relays.json['sorted']['family'][member]['middle_count'] = 0
+            bw = relay['observed_bandwidth']
+            relays.json['sorted']['family'][member]['relays'].append(idx)
+            relays.json['sorted']['family'][member]['bw'] += bw
+            if 'Exit' in relay['flags']:
+                relays.json['sorted']['family'][member]['exit_count'] += 1
+            else:
+                relays.json['sorted']['family'][member]['middle_count'] += 1
 
 def unsorted(relays, filename, is_index):
     '''
@@ -128,15 +143,22 @@ def effective_family(relays):
     for family in relays.json['sorted']['family']:
         members = []
         bandwidth = relays.json['sorted']['family'][family]['bw']
+        exit_count = relays.json['sorted']['family'][family]['exit_count']
+        middle_count = relays.json['sorted']['family'][family]['middle_count']
         for m_relay in relays.json['sorted']['family'][family]['relays']:
             members.append(relay_list[m_relay])
         dir_path = os.path.join(output_path, family)
         os.makedirs(dir_path)
         f_bandwidth = round(bandwidth / 1000000, 2) # convert to MB/s
         relays.json['relay_subset'] = members
-        rendered = template.render(relays=relays, bandwidth=f_bandwidth,
-                                   is_index=False, path_prefix='../../',
-                                   deactivate='family', family=family)
+        rendered = template.render(relays=relays,
+                                   bandwidth=f_bandwidth,
+                                   exit_count=exit_count,
+                                   middle_count=middle_count,
+                                   is_index=False,
+                                   path_prefix='../../',
+                                   deactivate='family',
+                                   family=family)
         with open(os.path.join(dir_path, 'index.html'), 'w',
                   encoding='utf8') as html:
             html.write(rendered)
@@ -159,13 +181,19 @@ def pages_by_key(relays, key):
         for idx in relays.json['sorted'][key][v]['relays']:
             m_relays.append(relays.json['relays'][idx])
         bandwidth = relays.json['sorted'][key][v]['bw']
+        exit_count = relays.json['sorted'][key][v]['exit_count']
+        middle_count = relays.json['sorted'][key][v]['middle_count']
         dir_path = os.path.join(output_path, v)
         os.makedirs(dir_path)
         f_bandwidth = round(bandwidth / 1000000, 2) # convert to MB/s
         relays.json['relay_subset'] = m_relays
         rendered = template.render(relays=relays,
-                                   bandwidth=f_bandwidth, is_index=False,
-                                   path_prefix='../../', deactivate=key,
+                                   bandwidth=f_bandwidth,
+                                   exit_count=exit_count,
+                                   middle_count=middle_count,
+                                   is_index=False,
+                                   path_prefix='../../',
+                                   deactivate=key,
                                    special_countries=countries.THE_PREFIXED)
         with open(os.path.join(dir_path, 'index.html'), 'w',
                   encoding='utf8') as html:
@@ -188,12 +216,18 @@ def pages_by_flag(relays):
         for idx in relays.json['sorted']['flags'][flag]['relays']:
             m_relays.append(relays.json['relays'][idx])
         bandwidth = relays.json['sorted']['flags'][flag]['bw']
+        exit_count = relays.json['sorted']['flags'][flag]['exit_count']
+        middle_count = relays.json['sorted']['flags'][flag]['middle_count']
         os.makedirs(output_path)
         f_bandwidth = round(bandwidth / 1000000, 2) # convert to MB/s
         relays.json['relay_subset'] = m_relays
         rendered = template.render(relays=relays,
-                                   bandwidth=f_bandwidth, is_index=False,
-                                   path_prefix='../../', deactivate=flag,
+                                   bandwidth=f_bandwidth,
+                                   exit_count=exit_count,
+                                   middle_count=middle_count,
+                                   is_index=False,
+                                   path_prefix='../../',
+                                   deactivate=flag,
                                    special_countries=countries.THE_PREFIXED,
                                    flag=flag)
         with open(os.path.join(output_path, 'index.html'), 'w',
