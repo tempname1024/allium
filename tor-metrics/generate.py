@@ -21,29 +21,6 @@ ABS_PATH = os.path.dirname(os.path.abspath(__file__))
 ENV = Environment(loader=FileSystemLoader(os.path.join(ABS_PATH, 'templates')),
                   trim_blocks=True, lstrip_blocks=True)
 
-def generate_html(relays):
-    '''
-    Render and write complete set of relay pages to disk by calling each group's
-    respective function
-
-    Files are written to 'www' by default (defined in config.py)
-
-    :relays: relays class object containing relay set (list of dict)
-    '''
-    sort_relays(relays)
-    pages_by_key(relays, 'as')
-    pages_by_key(relays, 'country')
-    pages_by_key(relays, 'platform')
-    pages_by_flag(relays)
-    effective_family(relays)
-    unsorted(relays, 'index.html', is_index=True)
-    unsorted(relays, 'all.html', is_index=False)
-    relay_info(relays)
-    static_src_path = os.path.join(ABS_PATH, 'static')
-    static_dest_path = os.path.join(config.CONFIG['output_root'], 'static')
-    if not os.path.exists(static_dest_path):
-        copytree(static_src_path, static_dest_path)
-
 def sort_relays(relays):
     '''
     Add a list of dict sorted by unique keys derived from relays as they're
@@ -256,6 +233,7 @@ def relay_info(relays):
             html.write(rendered)
 
 if __name__ == '__main__':
+    # make request to onionoo, populate relays object
     try:
         RELAY_SET = Relays()
     except Exception as err:
@@ -263,4 +241,19 @@ if __name__ == '__main__':
         print(err)
         sys.exit()
 
-    generate_html(RELAY_SET)
+    # generate relay HTML documents
+    sort_relays(RELAY_SET)
+    pages_by_key(RELAY_SET, 'as')
+    pages_by_key(RELAY_SET, 'country')
+    pages_by_key(RELAY_SET, 'platform')
+    pages_by_flag(RELAY_SET)
+    effective_family(RELAY_SET)
+    unsorted(RELAY_SET, 'index.html', is_index=True)
+    unsorted(RELAY_SET, 'all.html', is_index=False)
+    relay_info(RELAY_SET)
+
+    # copy static directory and its contents
+    static_src_path = os.path.join(ABS_PATH, 'static')
+    static_dest_path = os.path.join(config.CONFIG['output_root'], 'static')
+    if not os.path.exists(static_dest_path):
+        copytree(static_src_path, static_dest_path)
