@@ -3,7 +3,6 @@
 {% block body %}
 <div id="content">
 <h2><a href="{{ path_prefix }}">Home</a> :: Relay "{{ relay['nickname'] }}"</h2>
-<hr>
 <div class="row">
     <div class="col-md-6">
         <dl>
@@ -163,7 +162,10 @@
             <dd>{{ relay['consensus_weight_fraction']|escape }} ({{ relay['consensus_weight']|escape }})</dd>
 
             <dt>Platform</dt>
-            <dd>{{ relay['platform']|escape }}</dd>
+            <dd>
+            <a href='{{ path_prefix}}platform/{{ relay['platform']|escape }}'>{{
+            relay['platform'] }}</a>
+            </dd>
 
         </dl>
     </div>
