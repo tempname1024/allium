@@ -5,6 +5,7 @@ Relays class object consisting of relays (list of dict) and onionoo fetch
 timestamp
 '''
 
+import hashlib
 import json
 import os
 import time
@@ -17,6 +18,27 @@ from jinja2 import Environment, FileSystemLoader
 ABS_PATH = os.path.dirname(os.path.abspath(__file__))
 ENV = Environment(loader=FileSystemLoader(os.path.join(ABS_PATH, 'templates')),
                   trim_blocks=True, lstrip_blocks=True)
+
+def hash_filter(value, hash_type='md5'):
+    '''
+    Custom hash filter for jinja; defaults to "md5" if no type specified
+
+    :param value: value to be hashed
+    :param hash_type: valid hash type
+    :return: computed hash as a hexadecimal string
+    '''
+    hash_func = getattr(hashlib, hash_type, None)
+
+    if hash_func:
+        computed_hash = hash_func(value.encode("utf-8")).hexdigest()
+    else:
+        raise AttributeError(
+            "No hashing function named {hname}".format(hname=hash_type)
+        )
+
+    return computed_hash
+
+ENV.filters['hash'] = hash_filter
 
 class Relays:
     '''
@@ -173,6 +195,26 @@ class Relays:
                     self.json['sorted']['family'][member]['exit_count'] += 1
                 else:
                     self.json['sorted']['family'][member]['middle_count'] += 1
+
+            c_str = relay.get('contact', '').encode('utf-8')
+            c_hash = hashlib.md5(c_str).hexdigest()
+            if 'contact' not in self.json['sorted']:
+                self.json['sorted']['contact'] = dict()
+            if not c_hash in self.json['sorted']['contact']:
+                self.json['sorted']['contact'][c_hash] = {
+                    'relays':       list(),
+                    'contact':      c_str,
+                    'bw':           0,
+                    'exit_count':   0,
+                    'middle_count': 0
+                }
+            bw = relay['observed_bandwidth']
+            self.json['sorted']['contact'][c_hash]['relays'].append(idx)
+            self.json['sorted']['contact'][c_hash]['bw'] += bw
+            if 'Exit' in relay['flags']:
+                self.json['sorted']['contact'][c_hash]['exit_count'] += 1
+            else:
+                self.json['sorted']['contact'][c_hash]['middle_count'] += 1
 
     def create_output_dir(self):
         '''

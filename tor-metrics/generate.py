@@ -33,6 +33,7 @@ if __name__ == '__main__':
     RELAY_SET.write_pages_by_key('as')
     RELAY_SET.write_pages_by_key('country')
     RELAY_SET.write_pages_by_key('platform')
+    RELAY_SET.write_pages_by_key('contact')
     RELAY_SET.write_pages_by_flag()
     RELAY_SET.write_relay_info()
 

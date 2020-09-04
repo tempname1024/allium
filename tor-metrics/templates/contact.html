@@ -1,0 +1,11 @@
+{% extends "relay-list.html" %}
+{% if relays.json['relay_subset'][0]['contact'] %}
+    {% set contact = relays.json['relay_subset'][0]['contact']|escape %}
+    {% set contact_hash = relays.json['relay_subset'][0]['contact']|hash %}
+{% else %}
+    {% set contact = 'none' %}
+    {% set contact_hash = ''|hash %}
+{% endif %}
+{% block title %}Tor Relays :: Contact {{ contact_hash }}{% endblock %}
+{% block header %}<a href="../../">Home</a> :: Contact {{ contact_hash }}{% endblock %}
+{% block description %}Relays with contact info <code>{{ contact }}</code> are responsible for ~{{ bandwidth }} MB/s of traffic, with {% if middle_count > 0 %}{{ middle_count }} middle relay{% if middle_count > 1 %}s{% endif %}{% if exit_count > 0 %} and {% endif %}{% endif %}{% if exit_count > 0 %}{{ exit_count }} exit relay{% if exit_count > 1 %}s{% endif %}{% endif %}.{% endblock %}

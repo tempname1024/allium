@@ -17,9 +17,9 @@
 
             <dt>Contact</dt>
             {% if relay['contact'] %}
-                <dd>{{ relay['contact']|escape }}</dd>
+                <dd><a href="{{ path_prefix }}contact/{{ relay['contact']|hash }}">{{ relay['contact']|escape }}</a></dd>
             {% else %}
-                <dd>none</dd>
+                <dd><a href="{{ path_prefix }}contact/{{ ''|hash }}">none</a></dd>
             {% endif %}
 
             <dt>Dir Address</dt>
