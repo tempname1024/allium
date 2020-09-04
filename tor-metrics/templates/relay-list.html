@@ -6,6 +6,7 @@
 <table class="table table-condensed">
     <tr>
         <th>Nickname</th>
+        <th>&#9993;</th>
         <th>Bandwidth</th>
         <th class="visible-md visible-lg">IP Address</th>
         <th>AS Number</th>
@@ -27,9 +28,18 @@
             {% set obs_bandwidth = '%s %s'|format((relay['observed_bandwidth'] / 1000)|round(2, 'common'), 'KB/s') %}{% endif %}
 
             {% if deactivate != 'family' and relay['effective_family']|length > 1 %}
-            <td><a href="{{ path_prefix }}relay/{{ relay['fingerprint']|escape }}.html">{{ relay['nickname']|escape }}</a> (<a href="{{ path_prefix }}family/{{ relay['effective_family'][0]|escape }}/">{{ relay['effective_family']|length }}</a>)</td>
+            <td><a href="{{ path_prefix }}relay/{{ relay['fingerprint']|escape }}.html">{{ relay['nickname']|truncate(10)|escape }}</a> (<a href="{{ path_prefix }}family/{{ relay['effective_family'][0]|escape }}/">{{ relay['effective_family']|length }}</a>)</td>
             {% else %}
-            <td><a href="{{ path_prefix}}relay/{{ relay['fingerprint']|escape }}.html">{{ relay['nickname']|escape }}</a></td>{% endif %}
+            <td><a href="{{ path_prefix}}relay/{{ relay['fingerprint']|escape }}.html">{{ relay['nickname']|truncate(10)|escape }}</a></td>{% endif %}
+
+            {% if deactivate != 'contact' %}
+            {% if relay['contact'] %}
+            <td><a href="{{ path_prefix }}contact/{{ relay['contact']|hash }}/" title="{{ relay['contact']|escape }}">&#9993;<a></td>
+            {% else %}
+            <td title="none">&#9993;</td>{% endif %}
+            {% else %}
+            <td title="{{ relay['contact']|escape }}">&#9993;</td>{% endif %}
+
             <td>{{ obs_bandwidth }}</td>
 
             <td class="visible-md visible-lg">{{ relay['or_addresses'][0].split(':', 1)[0]|escape }}</td>
