@@ -8,7 +8,8 @@ tor-metrics: statically generated tor metrics and statistics
 
   $ ./generate.py
   $ ls ./www
-  all.html  as  country  family  flag  index.html  platform  relay  static
+  all.html  contact/  families.html  flag/       networks.html  relay/
+  as/       country/  family/        index.html  platform/      static/
   $
 
   TODO
