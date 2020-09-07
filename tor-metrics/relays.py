@@ -153,6 +153,21 @@ class Relays:
         else:
             self.json['sorted'][k][v]['middle_count'] += 1
 
+        if k is 'as':
+            self.json['sorted'][k][v]['country'] = relay.get('country')
+            self.json['sorted'][k][v]['country_name'] = relay.get('country')
+            self.json['sorted'][k][v]['as_name'] = relay.get('as_name')
+
+        if k is 'family':
+            self.json['sorted'][k][v]['contact'] = relay.get('contact')
+
+            # update the first_seen parameter to always contain the oldest
+            # relay's first_seen date
+            if not self.json['sorted'][k][v].get('first_seen'):
+                self.json['sorted'][k][v]['first_seen'] = relay['first_seen']
+            elif self.json['sorted'][k][v]['first_seen'] > relay['first_seen']:
+                self.json['sorted'][k][v]['first_seen'] = relay['first_seen']
+
     def _categorize(self):
         '''
         Iterate over self.json['relays'] set and call self._sort() against

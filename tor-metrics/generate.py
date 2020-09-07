@@ -24,6 +24,8 @@ if __name__ == '__main__':
     RELAY_SET.create_output_dir()
     RELAY_SET.write_unsorted('index.html', is_index=True)
     RELAY_SET.write_unsorted('all.html', is_index=False)
+    RELAY_SET.write_unsorted('families.html', is_index=False)
+    RELAY_SET.write_unsorted('networks.html', is_index=False)
     RELAY_SET.write_pages_by_key('as')
     RELAY_SET.write_pages_by_key('contact')
     RELAY_SET.write_pages_by_key('country')

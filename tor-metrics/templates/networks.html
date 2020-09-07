@@ -1,0 +1,46 @@
+{% extends "skeleton.html" %}
+{% block title %}Tor Relays :: Networks{% endblock %}
+{% block body %}
+<h2><a href="./">Home</a> :: Networks</h2>
+<p>The set of all ({{ relays.json['sorted']['as']|length }}) recognized networks running at least one relay. This data is onionoo-derived and might be out of date with respect to other sources.</p>
+<table class="table table-condensed">
+    <tr>
+        <th>AS Number</th>
+        <th>AS Name</th>
+        <th>Country</th>
+        <th>Bandwidth</th>
+        <th>Exit Count</th>
+        <th>Middle Count<th>
+    </tr>
+    <tbody>
+        {% for k, v in relays.json['sorted']['as'].items()|sort(attribute='1.bw', reverse=True) %}
+        <tr>
+            {% if v['bw'] > 1000000 %}
+            {% set obs_bandwidth = '%s %s'|format((v['bw'] / 1000000)|round(2, 'common'), 'MB/s') %}
+            {% else %}
+            {% set obs_bandwidth = '%s %s'|format((v['bw'] / 1000)|round(2, 'common'), 'KB/s') %}{% endif %}
+
+            <td><a href="{{ path_prefix}}as/{{ k|escape }}/">{{ k|escape }}</a></td>
+
+            {% if v['as_name'] %}
+            <td title="{{ v['as_name']|escape }}"><a href="https://bgp.he.net/{{ k|escape }}">{{ v['as_name']|truncate(20)|escape }}</a></td>
+            {% else %}
+            <td>Unknown</td>
+            {% endif %}
+
+            {% if v['country'] %}
+            <td><a href="{{ path_prefix }}country/{{ v['country']|escape }}/"><img src="{{ path_prefix }}static/images/cc/{{ v['country']|escape }}.png" title="{{ v['country_name']|escape }}"alt="{{ v['country_name']|escape }}"></a></td>
+            {% else %}
+            <td>X</td>
+            {% endif %}
+
+            <td>{{ obs_bandwidth }}</td>
+
+            <td>{{ v['exit_count'] }}</td>
+
+            <td>{{ v['middle_count'] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

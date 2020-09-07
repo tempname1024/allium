@@ -1,0 +1,47 @@
+{% extends "skeleton.html" %}
+{% block title %}Tor Relays :: Families{% endblock %}
+{% block body %}
+<h2><a href="./">Home</a> :: Families</h2>
+<p>The set of all ({{ relays.json['sorted']['family']|length }}) relay families with > 1 effective members. The first_seen parameter is taken from the oldest relay in the family.</p>
+<table class="table table-condensed">
+    <tr>
+        <th>Family</th>
+        <th>Bandwidth</th>
+        <th class="visible-md visible-lg">Contact</th>
+        <th>Exit Count</th>
+        <th>Middle Count</th>
+        <th>First Seen<th>
+    </tr>
+    <tbody>
+        {% set processed = dict() %}
+        {% for k, v in relays.json['sorted']['family'].items()|sort(attribute='1.bw', reverse=True) %}
+        {% if relays.json['relays'][v['relays'][0]]['fingerprint'] not in processed %}
+        <tr>
+            {% if v['bw'] > 1000000 %}
+            {% set obs_bandwidth = '%s %s'|format((v['bw'] / 1000000)|round(2, 'common'), 'MB/s') %}
+            {% else %}
+            {% set obs_bandwidth = '%s %s'|format((v['bw'] / 1000)|round(2, 'common'), 'KB/s') %}{% endif %}
+
+            <td><a href="{{ path_prefix}}family/{{ k|escape }}/">{{ k|escape }}</a></td>
+
+            <td>{{ obs_bandwidth }}</td>
+
+            {% if v['contact'] %}
+            <td class="visible-md visible-lg"><a href="{{ path_prefix }}contact/{{ v['contact']|hash }}/" title="{{ v['contact']|escape }}">{{ v['contact']|truncate(50)|escape }}<a></td>
+            {% else %}
+            <td>none</td>{% endif %}
+
+            <td>{{ v['exit_count'] }}</td>
+            <td>{{ v['middle_count'] }}</td>
+
+            <td>{{ v['first_seen'].split(' ', 1)[0]|escape }}</td>
+
+            {% for r in v['relays'] %}
+            {% set _dummy = processed.update({relays.json['relay_subset'][r]['fingerprint']: None}) %}
+            {% endfor %}
+        </tr>
+        {% endif %}
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
