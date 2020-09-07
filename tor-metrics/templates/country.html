@@ -1,7 +1,7 @@
 {% extends "relay-list.html" %}
 {% set country_orig = relays.json['relay_subset'][0]['country_name']|escape %}
 {% set country_abbr = relays.json['relay_subset'][0]['country']|escape %}
-{% if country_orig in special_countries %}
+{% if country_orig in sp_countries %}
     {% set country_name = 'The ' + country_orig %}
 {% else %}
     {% set country_name = country_orig %}

@@ -30,10 +30,10 @@ def hash_filter(value, hash_type='md5'):
     hash_func = getattr(hashlib, hash_type, None)
 
     if hash_func:
-        computed_hash = hash_func(value.encode("utf-8")).hexdigest()
+        computed_hash = hash_func(value.encode('utf-8')).hexdigest()
     else:
         raise AttributeError(
-            "No hashing function named {hname}".format(hname=hash_type)
+            'No hashing function named {hname}'.format(hname=hash_type)
         )
 
     return computed_hash
@@ -57,7 +57,7 @@ class Relays:
         self._fix_missing_observed_bandwidth()
         self._sort_by_bandwidth()
         self._trim_platform()
-        self._categorize_relays()
+        self._categorize()
 
     def _fetch_onionoo_details(self):
         '''
@@ -75,8 +75,7 @@ class Relays:
 
         api_response = urllib.request.urlopen(conn).read()
 
-        json_data = json.loads(api_response.decode('utf-8'))
-        return json_data
+        return json.loads(api_response.decode('utf-8'))
 
     def _trim_platform(self):
         '''
@@ -123,98 +122,59 @@ class Relays:
         if self.json is not None:
             with open(self.ts_file, 'w', encoding='utf8') as ts_file:
                 ts_file.write(f_timestamp)
+
         return f_timestamp
 
-    def _categorize_relays(self):
+    def _sort(self, relay, idx, k, v):
         '''
-        Add a list of dict sorted by unique keys derived from relays as they're
-        discovered, referenced by indice to the main set (relays.json['relays'])
+        Populate self.sorted dictionary with values from :relay:
 
-        This code looks (is) redundant but it saves us from multiple passes
-        over the entire set... not sure how to generalize it beyond the keys
-        list
+        :relay: relay from which values are derived
+        :idx: index at which the relay can be found in self.json['relays']
+        :k: the name of the key to use in self.sorted
+        :v: the name of the subkey to use in self.sorted[k]
+        '''
+        if not v or not v.isalnum():
+            return
+        if not k in self.json['sorted']:
+            self.json['sorted'][k] = dict()
+        if not v in self.json['sorted'][k]:
+            self.json['sorted'][k][v] = {
+                'relays':       list(),
+                'bw':           0,
+                'exit_count':   0,
+                'middle_count': 0
+            }
+        bw = relay['observed_bandwidth']
+        self.json['sorted'][k][v]['relays'].append(idx)
+        self.json['sorted'][k][v]['bw'] += bw
+        if 'Exit' in relay['flags']:
+            self.json['sorted'][k][v]['exit_count'] += 1
+        else:
+            self.json['sorted'][k][v]['middle_count'] += 1
+
+    def _categorize(self):
+        '''
+        Iterate over self.json['relays'] set and call self._sort() against
+        discovered relays with attributes we use to generate static sets
         '''
         self.json['sorted'] = dict()
         for idx, relay in enumerate(self.json['relays']):
             keys = ['as', 'country', 'platform']
             for key in keys:
-                v = relay.get(key)
-                if not v or not v.isalnum(): continue
-                if not key in self.json['sorted']:
-                    self.json['sorted'][key] = dict()
-                if not v in self.json['sorted'][key]:
-                    self.json['sorted'][key][v] = {
-                        'relays':       list(),
-                        'bw':           0,
-                        'exit_count':   0,
-                        'middle_count': 0
-                    }
-                bw = relay['observed_bandwidth']
-                self.json['sorted'][key][v]['relays'].append(idx)
-                self.json['sorted'][key][v]['bw'] += bw
-                if 'Exit' in relay['flags']:
-                    self.json['sorted'][key][v]['exit_count'] += 1
-                else:
-                    self.json['sorted'][key][v]['middle_count'] += 1
+                self._sort(relay, idx, key, relay.get(key))
 
             for flag in relay['flags']:
-                if not flag.isalnum(): continue
-                if not 'flags' in self.json['sorted']:
-                    self.json['sorted']['flags'] = dict()
-                if not flag in self.json['sorted']['flags']:
-                    self.json['sorted']['flags'][flag] = {
-                        'relays':       list(),
-                        'bw':           0,
-                        'exit_count':   0,
-                        'middle_count': 0
-                    }
-                bw = relay['observed_bandwidth']
-                self.json['sorted']['flags'][flag]['relays'].append(idx)
-                self.json['sorted']['flags'][flag]['bw'] += bw
-                if 'Exit' in relay['flags']:
-                    self.json['sorted']['flags'][flag]['exit_count'] += 1
-                else:
-                    self.json['sorted']['flags'][flag]['middle_count'] += 1
+                self._sort(relay, idx, 'flag', flag)
 
             for member in relay['effective_family']:
-                if not member.isalnum() or len(relay['effective_family']) < 2:
+                if not len(relay['effective_family']) > 2:
                     continue
-                if not 'family' in self.json['sorted']:
-                    self.json['sorted']['family'] = dict()
-                if not member in self.json['sorted']['family']:
-                    self.json['sorted']['family'][member] = {
-                        'relays':       list(),
-                        'bw':           0,
-                        'exit_count':   0,
-                        'middle_count': 0
-                    }
-                bw = relay['observed_bandwidth']
-                self.json['sorted']['family'][member]['relays'].append(idx)
-                self.json['sorted']['family'][member]['bw'] += bw
-                if 'Exit' in relay['flags']:
-                    self.json['sorted']['family'][member]['exit_count'] += 1
-                else:
-                    self.json['sorted']['family'][member]['middle_count'] += 1
+                self._sort(relay, idx, 'family', member)
 
             c_str = relay.get('contact', '').encode('utf-8')
             c_hash = hashlib.md5(c_str).hexdigest()
-            if 'contact' not in self.json['sorted']:
-                self.json['sorted']['contact'] = dict()
-            if not c_hash in self.json['sorted']['contact']:
-                self.json['sorted']['contact'][c_hash] = {
-                    'relays':       list(),
-                    'contact':      c_str,
-                    'bw':           0,
-                    'exit_count':   0,
-                    'middle_count': 0
-                }
-            bw = relay['observed_bandwidth']
-            self.json['sorted']['contact'][c_hash]['relays'].append(idx)
-            self.json['sorted']['contact'][c_hash]['bw'] += bw
-            if 'Exit' in relay['flags']:
-                self.json['sorted']['contact'][c_hash]['exit_count'] += 1
-            else:
-                self.json['sorted']['contact'][c_hash]['middle_count'] += 1
+            self._sort(relay, idx, 'contact', c_hash)
 
     def create_output_dir(self):
         '''
@@ -236,98 +196,37 @@ class Relays:
         with open(output, 'w', encoding='utf8') as html:
             html.write(template_render)
 
-    def write_effective_family(self):
+    def write_pages_by_key(self, k):
         '''
-        Render and write HTML listings to disk sorted by effective family
+        Render and write HTML listings to disk sorted by :k:
         '''
-        template = ENV.get_template('effective_family.html')
-        output_path = os.path.join(config.CONFIG['output_root'], 'family')
+        template = ENV.get_template(k + '.html')
+        output_path = os.path.join(config.CONFIG['output_root'], k)
         if os.path.exists(output_path):
             rmtree(output_path)
-        for family in self.json['sorted']['family']:
-            i = self.json['sorted']['family'][family]
+        for v in self.json['sorted'][k]:
+            i = self.json['sorted'][k][v]
             members = []
             for m_relay in i['relays']:
                 members.append(self.json['relays'][m_relay])
-            dir_path = os.path.join(output_path, family)
+            if k is 'flag':
+                dir_path = os.path.join(output_path, v.lower())
+            else:
+                dir_path = os.path.join(output_path, v)
             os.makedirs(dir_path)
             self.json['relay_subset'] = members
             rendered = template.render(
-                relays=self,
-                bandwidth=round(i['bw'] / 1000000, 2),
-                exit_count=i['exit_count'],
-                middle_count=i['middle_count'],
-                is_index=False,
-                path_prefix='../../',
-                deactivate='family',
-                family=family
+                relays       = self,
+                bandwidth    = round(i['bw'] / 1000000, 2),
+                exit_count   = i['exit_count'],
+                middle_count = i['middle_count'],
+                is_index     = False,
+                path_prefix  = '../../',
+                deactivate   = k,
+                value        = v,
+                sp_countries = countries.THE_PREFIXED
             )
             with open(os.path.join(dir_path, 'index.html'), 'w',
-                      encoding='utf8') as html:
-                html.write(rendered)
-
-    def write_pages_by_key(self, key):
-        '''
-        Render and write HTML listings to disk sorted by KEY
-
-        :key: relays['sorted'] key (onionoo parameter) containing list of indices
-              belonging to key
-        '''
-        template = ENV.get_template(key + '.html')
-        output_path = os.path.join(config.CONFIG['output_root'], key)
-        if os.path.exists(output_path):
-            rmtree(output_path)
-        for v in self.json['sorted'][key]:
-            i = self.json['sorted'][key][v]
-            m_relays = list()
-            for idx in i['relays']:
-                m_relays.append(self.json['relays'][idx])
-            dir_path = os.path.join(output_path, v)
-            os.makedirs(dir_path)
-            self.json['relay_subset'] = m_relays
-            rendered = template.render(
-                relays=self,
-                bandwidth=round(i['bw'] / 1000000, 2),
-                exit_count=i['exit_count'],
-                middle_count=i['middle_count'],
-                is_index=False,
-                path_prefix='../../',
-                deactivate=key,
-                special_countries=countries.THE_PREFIXED
-            )
-            with open(os.path.join(dir_path, 'index.html'), 'w',
-                      encoding='utf8') as html:
-                html.write(rendered)
-
-    def write_pages_by_flag(self):
-        '''
-        Render and write HTML listings to disk sorted by FLAG
-        '''
-        template = ENV.get_template('flag.html')
-        for flag in self.json['sorted']['flags']:
-            i = self.json['sorted']['flags'][flag]
-            output_path = os.path.join(config.CONFIG['output_root'], 'flag',
-                                       flag.lower())
-            if os.path.exists(output_path):
-                rmtree(output_path)
-            relay_list = self.json['relays']
-            m_relays = list()
-            for idx in i['relays']:
-                m_relays.append(self.json['relays'][idx])
-            os.makedirs(output_path)
-            self.json['relay_subset'] = m_relays
-            rendered = template.render(
-                relays=self,
-                bandwidth=round(i['bw'] / 1000000, 2),
-                exit_count=i['exit_count'],
-                middle_count=i['middle_count'],
-                is_index=False,
-                path_prefix='../../',
-                deactivate=flag,
-                special_countries=countries.THE_PREFIXED,
-                flag=flag
-            )
-            with open(os.path.join(output_path, 'index.html'), 'w',
                       encoding='utf8') as html:
                 html.write(rendered)
 
@@ -345,9 +244,9 @@ class Relays:
             if not relay['fingerprint'].isalnum():
                 continue
             rendered = template.render(
-                relay=relay,
-                path_prefix='../',
-                relays=self
+                relay       = relay,
+                path_prefix = '../',
+                relays      = self
             )
             with open(os.path.join(output_path, '%s.html' % relay['fingerprint']),
                       'w', encoding='utf8') as html:

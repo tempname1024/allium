@@ -18,23 +18,18 @@ from relays import Relays
 ABS_PATH = os.path.dirname(os.path.abspath(__file__))
 
 if __name__ == '__main__':
-    try:
-        RELAY_SET = Relays()
-    except Exception as err:
-        print('error creating relays object from onionoo response, aborting...')
-        print(err)
-        sys.exit()
+    RELAY_SET = Relays()
 
     # generate relay HTML documents
     RELAY_SET.create_output_dir()
     RELAY_SET.write_unsorted('index.html', is_index=True)
     RELAY_SET.write_unsorted('all.html', is_index=False)
-    RELAY_SET.write_effective_family()
     RELAY_SET.write_pages_by_key('as')
-    RELAY_SET.write_pages_by_key('country')
-    RELAY_SET.write_pages_by_key('platform')
     RELAY_SET.write_pages_by_key('contact')
-    RELAY_SET.write_pages_by_flag()
+    RELAY_SET.write_pages_by_key('country')
+    RELAY_SET.write_pages_by_key('family')
+    RELAY_SET.write_pages_by_key('flag')
+    RELAY_SET.write_pages_by_key('platform')
     RELAY_SET.write_relay_info()
 
     # copy static directory and its contents
