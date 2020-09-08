@@ -22,10 +22,56 @@ if __name__ == '__main__':
 
     # generate relay HTML documents
     RELAY_SET.create_output_dir()
-    RELAY_SET.write_unsorted('index.html', is_index=True)
-    RELAY_SET.write_unsorted('all.html', is_index=False)
-    RELAY_SET.write_unsorted('families.html', is_index=False)
-    RELAY_SET.write_unsorted('networks.html', is_index=False)
+    RELAY_SET.write_misc(
+        template    = 'index.html',
+        path        = 'index.html',
+        path_prefix = './',
+        is_index    = True,
+    )
+    RELAY_SET.write_misc(
+        template  = 'all.html',
+        path      = 'misc/all.html'
+    )
+    RELAY_SET.write_misc(
+        template  = 'misc-families.html',
+        path      = 'misc/families-by-bandwidth.html',
+        sorted_by = '1.bandwidth'
+    )
+    RELAY_SET.write_misc(
+        template  = 'misc-families.html',
+        path      = 'misc/families-by-exit-count.html',
+        sorted_by = '1.exit_count,1.bandwidth'
+    )
+    RELAY_SET.write_misc(
+        template  = 'misc-families.html',
+        path      = 'misc/families-by-middle-count.html',
+        sorted_by = '1.middle_count,1.bandwidth'
+    )
+    RELAY_SET.write_misc(
+        template  = 'misc-families.html',
+        path      = 'misc/families-by-first-seen.html',
+        sorted_by = '1.first_seen,1.bandwidth'
+    )
+    RELAY_SET.write_misc(
+        template  = 'misc-networks.html',
+        path      = 'misc/networks-by-bandwidth.html',
+        sorted_by = '1.bandwidth'
+    )
+    RELAY_SET.write_misc(
+        template  = 'misc-networks.html',
+        path      = 'misc/networks-by-exit-count.html',
+        sorted_by = '1.exit_count,1.bandwidth'
+    )
+    RELAY_SET.write_misc(
+        template  = 'misc-networks.html',
+        path      = 'misc/networks-by-middle-count.html',
+        sorted_by = '1.middle_count,1.bandwidth'
+    )
+    RELAY_SET.write_misc(
+        template  = 'misc-networks.html',
+        path      = 'misc/networks-by-first-seen.html',
+        sorted_by = '1.first_seen,1.bandwidth'
+    )
     RELAY_SET.write_pages_by_key('as')
     RELAY_SET.write_pages_by_key('contact')
     RELAY_SET.write_pages_by_key('country')

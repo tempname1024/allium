@@ -141,13 +141,13 @@ class Relays:
         if not v in self.json['sorted'][k]:
             self.json['sorted'][k][v] = {
                 'relays':       list(),
-                'bw':           0,
+                'bandwidth':    0,
                 'exit_count':   0,
                 'middle_count': 0
             }
         bw = relay['observed_bandwidth']
         self.json['sorted'][k][v]['relays'].append(idx)
-        self.json['sorted'][k][v]['bw'] += bw
+        self.json['sorted'][k][v]['bandwidth'] += bw
         if 'Exit' in relay['flags']:
             self.json['sorted'][k][v]['exit_count'] += 1
         else:
@@ -197,17 +197,29 @@ class Relays:
         '''
         os.makedirs(config.CONFIG['output_root'],exist_ok=True)
 
-    def write_unsorted(self, filename, is_index):
+    def write_misc(self, template, path, path_prefix='../', sorted_by=None,
+            reverse=True, is_index=False):
         '''
         Render and write unsorted HTML listings to disk
 
-        :filename: filename to write unsorted listing (e.g. all.html)
-        :is_index: whether the file is an index or not (True/False)
+        :template:    jinja template name
+        :path_prefix: path to prefix other docs/includes
+        :path:        path to generate HTML document
+        :sorted_by:   key to sort by, used in family and networks pages
+        :reverse:     passed to sort() function in family and networks pages
+        :is_index:    whether document is main index listing, limits list to 500
         '''
-        template = ENV.get_template(filename)
+        template = ENV.get_template(template)
         self.json['relay_subset'] = self.json['relays']
-        template_render = template.render(relays=self, is_index=is_index)
-        output = os.path.join(config.CONFIG['output_root'], filename)
+        template_render = template.render(
+            relays      = self,
+            sorted_by   = sorted_by,
+            reverse     = reverse,
+            is_index    = is_index,
+            path_prefix = path_prefix
+        )
+        output = os.path.join(config.CONFIG['output_root'], path)
+        os.makedirs(os.path.dirname(output), exist_ok=True)
         with open(output, 'w', encoding='utf8') as html:
             html.write(template_render)
 
@@ -232,7 +244,7 @@ class Relays:
             self.json['relay_subset'] = members
             rendered = template.render(
                 relays       = self,
-                bandwidth    = round(i['bw'] / 1000000, 2),
+                bandwidth    = round(i['bandwidth'] / 1000000, 2),
                 exit_count   = i['exit_count'],
                 middle_count = i['middle_count'],
                 is_index     = False,
