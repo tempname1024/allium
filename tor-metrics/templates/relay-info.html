@@ -47,8 +47,8 @@
             <dd>
             {% if relay['exit_policy_summary'] -%}
                 {%- set v4_summary = relay['exit_policy_summary'].items() -%}
-                <pre class="pre-scrollable">{% for key, value in v4_summary -%}
-                    {{ key|escape }}: {{ value[0]|escape }}
+                <pre class="pre-scrollable">{% for k, v in v4_summary -%}
+                    {{ k|escape }}: {{ '\n  ' + v|join('\n  ')|escape }}
                 {% endfor -%}
                 </pre>
             {% else -%}
@@ -60,8 +60,8 @@
             <dd>
             {% if relay['exit_policy_v6_summary'] -%}
                 {%- set v6_summary = relay['exit_policy_v6_summary'].items() -%}
-                <pre class="pre-scrollable">{% for key, value in v6_summary -%}
-                    {{ key|escape }}: {{ value[0]|escape }}
+                <pre class="pre-scrollable">{% for k, v in v6_summary -%}
+                    {{ k|escape }}: {{ '\n  ' + v|join('\n  ')|escape }}
                 {% endfor -%}
                 </pre>
             {% else -%}
