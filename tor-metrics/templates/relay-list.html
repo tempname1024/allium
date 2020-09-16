@@ -34,7 +34,7 @@
 
             {% if deactivate != 'contact' %}
             {% if relay['contact'] %}
-            <td><a href="{{ path_prefix }}contact/{{ relay['contact']|hash }}/" title="{{ relay['contact']|escape }}">&#9993;<a></td>
+            <td><a href="{{ path_prefix }}contact/{{ relay['contact']|hash }}/" title="{{ relay['contact']|escape }}">&#9993;</a></td>
             {% else %}
             <td title="none">&#9993;</td>{% endif %}
             {% else %}
@@ -42,7 +42,7 @@
 
             <td>{{ obs_bandwidth }}</td>
 
-            <td class="visible-md visible-lg">{{ relay['or_addresses'][0].split(':', 1)[0]|escape }}</td>
+            <td class="visible-md visible-lg"><a href="https://bgp.he.net/ip/{{ relay['or_addresses'][0].split(':', 1)[0]|escape }}">{{ relay['or_addresses'][0].split(':', 1)[0]|escape }}</a></td>
 
             {% if relay['as'] %}{% if deactivate != 'as' %}
             <td><a href="{{ path_prefix }}as/{{ relay['as']|escape }}/">{{ relay['as']|escape }}</a></td>
