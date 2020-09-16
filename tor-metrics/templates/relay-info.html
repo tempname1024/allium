@@ -122,7 +122,9 @@
             <dt>Host Name</dt>
             <dd>
             {% if relay['verified_host_names'] -%}
-                <pre>{{ relay['verified_host_names'][0]|escape }}</pre>
+                <pre class="verified-hostname" title="verified hostname">{{ relay['verified_host_names']|join('\n')|escape }}</pre>
+            {% elif relay['unverified_host_names'] -%}
+                <pre class="unverified-hostname" title="unverified hostname">{{ relay['unverified_host_names']|join('\n')|escape }}</pre>
             {% else -%}
                 <pre>none</pre>
             {% endif -%}
