@@ -15,14 +15,11 @@
         <th><a href="networks-by-bandwidth.html">Bandwidth</a></th>
         {% endif %}
         {% if sorted_by_label == 'exit_count' %}
-        <th>Exit Count</th>
+        <th>Exit / <a href="networks-by-middle-count.html">Middle</a></th>
+        {% elif sorted_by_label == 'middle_count' %}
+        <th><a href="networks-by-exit-count.html">Exit</a> / Middle</th>
         {% else %}
-        <th><a href="networks-by-exit-count.html">Exit Count</a></th>
-        {% endif %}
-        {% if sorted_by_label == 'middle_count' %}
-        <th>Middle Count</th>
-        {% else %}
-        <th><a href="networks-by-middle-count.html">Middle Count</a></th>
+        <th><a href="networks-by-exit-count.html">Exit</a> / <a href="families-by-middle-count.html">Middle</a></th>
         {% endif %}
     </tr>
     <tbody>
@@ -49,9 +46,7 @@
 
             <td>{{ obs_bandwidth }}</td>
 
-            <td>{{ v['exit_count'] }}</td>
-
-            <td>{{ v['middle_count'] }}</td>
+            <td>{{ v['exit_count'] }} / {{ v['middle_count'] }}</td>
         </tr>
         {% endfor %}
     </tbody>

@@ -14,14 +14,11 @@
         {% endif %}
         <th class="visible-md visible-lg">Contact</th>
         {% if sorted_by_label == 'exit_count' %}
-        <th>Exit Count</th>
+        <th>Exit / <a href="families-by-middle-count.html">Middle</a></th>
+        {% elif sorted_by_label == 'middle_count' %}
+        <th><a href="families-by-exit-count.html">Exit</a> / Middle</th>
         {% else %}
-        <th><a href="families-by-exit-count.html">Exit Count</a></th>
-        {% endif %}
-        {% if sorted_by_label == 'middle_count' %}
-        <th>Middle Count</th>
-        {% else %}
-        <th><a href="families-by-middle-count.html">Middle Count</a></th>
+        <th><a href="families-by-exit-count.html">Exit</a> / <a href="families-by-middle-count.html">Middle</a></th>
         {% endif %}
         {% if sorted_by_label == 'first_seen' %}
         <th>First Seen</th>
@@ -48,10 +45,9 @@
             {% else %}
             <td>none</td>{% endif %}
 
-            <td>{{ v['exit_count'] }}</td>
-            <td>{{ v['middle_count'] }}</td>
+            <td>{{ v['exit_count'] }} / {{ v['middle_count'] }}</td>
 
-            <td>{{ v['first_seen'].split(' ', 1)[0]|escape }}</td>
+            <td><a href="{{ path_prefix }}first_seen/{{ v['first_seen'].split(' ', 1)[0]|escape }}">{{ v['first_seen'].split(' ', 1)[0]|escape }}</a></td>
 
             {% for r in v['relays'] %}
             {% set _dummy = processed.update({relays.json['relay_subset'][r]['fingerprint']: None}) %}
