@@ -27,55 +27,69 @@
             {% else %}
             {% set obs_bandwidth = '%s %s'|format((relay['observed_bandwidth'] / 1000)|round(2, 'common'), 'KB/s') %}{% endif %}
 
-            {% if deactivate != 'family' and relay['effective_family']|length > 1 %}
+            {% if key != 'family' and relay['effective_family']|length > 1 %}
             <td title="{{ relay['nickname']|escape }}"><a href="{{ path_prefix }}relay/{{ relay['fingerprint']|escape }}.html">{{ relay['nickname']|truncate(10)|escape }}</a> (<a href="{{ path_prefix }}family/{{ relay['effective_family'][0]|escape }}/">{{ relay['effective_family']|length }}</a>)</td>
             {% else %}
-            <td title="{{ relay['nickname']|escape }}"><a href="{{ path_prefix}}relay/{{ relay['fingerprint']|escape }}.html">{{ relay['nickname']|truncate(15)|escape }}</a></td>{% endif %}
+            <td title="{{ relay['nickname']|escape }}"><a href="{{ path_prefix}}relay/{{ relay['fingerprint']|escape }}.html">{{ relay['nickname']|truncate(15)|escape }}</a></td>
+            {% endif %}
 
-            {% if deactivate != 'contact' %}
+            {% if key != 'contact' %}
             {% if relay['contact'] %}
             <td><a href="{{ path_prefix }}contact/{{ relay['contact']|hash }}/" title="{{ relay['contact']|escape }}">&#9993;</a></td>
             {% else %}
-            <td title="none">&#9993;</td>{% endif %}
+            <td title="none">&#9993;</td>
+            {% endif %}
             {% else %}
-            <td title="{{ relay['contact']|escape }}">&#9993;</td>{% endif %}
+            <td title="{{ relay['contact']|escape }}">&#9993;</td>
+            {% endif %}
 
             <td>{{ obs_bandwidth }}</td>
 
             <td class="visible-md visible-lg"><a href="https://bgp.he.net/ip/{{ relay['or_addresses'][0].split(':', 1)[0]|escape }}">{{ relay['or_addresses'][0].split(':', 1)[0]|escape }}</a></td>
 
-            {% if relay['as'] %}{% if deactivate != 'as' %}
+            {% if relay['as'] %}{% if key != 'as' %}
             <td><a href="{{ path_prefix }}as/{{ relay['as']|escape }}/">{{ relay['as']|escape }}</a></td>
             {% else %}
-            <td>{{ relay['as']|escape }}</td>{% endif %}
+            <td>{{ relay['as']|escape }}</td>
+            {% endif %}
             {% else %}
-            <td>Unknown</td>{% endif %}
+            <td>Unknown</td>
+            {% endif %}
 
             {% if relay['as_name'] %}
             <td><a href="https://bgp.he.net/{{ relay['as']|escape }}" title="{{ relay['as_name']|escape }}">{{ relay['as_name']|escape|truncate(length=20) }}</a></td>
             {% else %}
-            <td>Unknown</td>{% endif %}
+            <td>Unknown</td>
+            {% endif %}
 
-            {% if relay['country'] %}{% if deactivate != 'country' %}
+            {% if relay['country'] %}{% if key != 'country' %}
             <td><a href="{{ path_prefix }}country/{{ relay['country']|escape }}/"><img src="{{ path_prefix }}static/images/cc/{{ relay['country']|escape }}.png" title="{{ relay['country_name']|escape }}" alt="{{ relay['country_name']|escape }}"></a></td>
             {% else %}
-            <td><img src="{{ path_prefix }}static/images/cc/{{ relay['country']|escape }}.png" title="{{ relay['country_name']|escape }}" alt="{{ relay['country_name']|escape }}"></td>{% endif %}
+            <td><img src="{{ path_prefix }}static/images/cc/{{ relay['country']|escape }}.png" title="{{ relay['country_name']|escape }}" alt="{{ relay['country_name']|escape }}"></td>
+            {% endif %}
             {% else %}
-            <td>X</td>{% endif %}
+            <td>X</td>
+            {% endif %}
 
-            {% if deactivate != 'platform' %}
+            {% if key != 'platform' %}
             <td><a href="{{ path_prefix }}platform/{{ relay['platform']|escape }}/">{{ relay['platform']|truncate(length=10)|escape }}</a></td>
             {% else %}
-            <td>{{ relay['platform']|truncate(length=10)|escape }}</td>{% endif %}
+            <td>{{ relay['platform']|truncate(length=10)|escape }}</td>
+            {% endif %}
 
             <td>{% for flag in relay['flags'] %}{% if flag != 'StaleDesc' %}<a href="{{ path_prefix }}flag/{{ flag.lower()|escape }}"><img src="{{ path_prefix}}static/images/flags/{{ flag.lower()|escape }}.png" title="{{ flag|escape }}" alt="{{ flag|escape }}"></a> {% endif %}{% endfor %}</td>
 
             {% if relay['running'] %}
             <td class="visible-md visible-lg"><font color="green">True</font></td>
             {% else %}
-            <td class="visible-md visible-lg"><font color="red">False</font></td>{% endif %}
+            <td class="visible-md visible-lg"><font color="red">False</font></td>
+            {% endif %}
 
+            {% if key != 'first_seen' %}
+            <td class="visible-md visible-lg"><a href="{{ path_prefix }}first_seen/{{ relay['first_seen'].split(' ', 1)[0]|escape }}">{{ relay['first_seen'].split(' ', 1)[0]|escape }}</a></td>
+            {% else %}
             <td class="visible-md visible-lg">{{ relay['first_seen'].split(' ', 1)[0]|escape }}</td>
+            {% endif %}
         </tr>
         {% endfor %}
     </tbody>

@@ -153,7 +153,7 @@
             {% endif -%}
 
             <dt>First Seen</dt>
-            <dd>{{ relay['first_seen']|escape }}</dd>
+            <dd><a href="{{ path_prefix }}first_seen/{{ relay['first_seen'].split(' ', 1)[0]|escape }}">{{ relay['first_seen']|escape }}</a></dd>
 
             <dt>Last Restarted</dt>
             <dd>{{ relay['last_restarted']|escape }}</dd>

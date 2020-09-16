@@ -8,6 +8,7 @@ timestamp
 import hashlib
 import json
 import os
+import re
 import time
 import urllib.request
 from shutil import rmtree
@@ -134,7 +135,7 @@ class Relays:
         :k: the name of the key to use in self.sorted
         :v: the name of the subkey to use in self.sorted[k]
         '''
-        if not v or not v.isalnum():
+        if not v or not re.match(r'^[A-Za-z0-9_-]+$', v):
             return
         if not k in self.json['sorted']:
             self.json['sorted'][k] = dict()
@@ -186,6 +187,8 @@ class Relays:
                 if not len(relay['effective_family']) > 1:
                     continue
                 self._sort(relay, idx, 'family', member)
+
+            self._sort(relay, idx, 'first_seen', relay['first_seen'].split(' ')[0])
 
             c_str = relay.get('contact', '').encode('utf-8')
             c_hash = hashlib.md5(c_str).hexdigest()
@@ -249,7 +252,7 @@ class Relays:
                 middle_count = i['middle_count'],
                 is_index     = False,
                 path_prefix  = '../../',
-                deactivate   = k,
+                key          = k,
                 value        = v,
                 sp_countries = countries.THE_PREFIXED
             )

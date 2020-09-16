@@ -78,6 +78,7 @@ if __name__ == '__main__':
     RELAY_SET.write_pages_by_key('family')
     RELAY_SET.write_pages_by_key('flag')
     RELAY_SET.write_pages_by_key('platform')
+    RELAY_SET.write_pages_by_key('first_seen')
     RELAY_SET.write_relay_info()
 
     # copy static directory and its contents
