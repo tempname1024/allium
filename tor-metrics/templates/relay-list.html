@@ -5,6 +5,7 @@
 <p>{% block description %}{% endblock %}</p>
 <table class="table table-condensed">
     <tr>
+        <th></th>
         <th>Nickname</th>
         <th></th>
         <th>Bandwidth</th>
@@ -14,7 +15,6 @@
         <th>Country</th>
         <th>Platform</th>
         <th>Flags</th>
-        <th class="visible-md visible-lg">Running</th>
         <th class="visible-md visible-lg">First Seen</th>
     </tr>
     <tbody>
@@ -26,6 +26,12 @@
             {% set obs_bandwidth = '%s %s'|format((relay['observed_bandwidth'] / 1000000)|round(2, 'common'), 'MB/s') %}
             {% else %}
             {% set obs_bandwidth = '%s %s'|format((relay['observed_bandwidth'] / 1000)|round(2, 'common'), 'KB/s') %}{% endif %}
+
+            {% if relay['running'] %}
+            <td class="relay-online" title="This relay is online">⚫</td>
+            {% else %}
+            <td class="relay-offline" title="This relay is offline">⚫</td>
+            {% endif %}
 
             {% if key != 'family' and relay['effective_family']|length > 1 %}
             <td title="{{ relay['nickname']|escape }}"><a href="{{ path_prefix }}relay/{{ relay['fingerprint']|escape }}.html">{{ relay['nickname']|truncate(10)|escape }}</a> (<a href="{{ path_prefix }}family/{{ relay['effective_family'][0]|escape }}/">{{ relay['effective_family']|length }}</a>)</td>
@@ -78,12 +84,6 @@
             {% endif %}
 
             <td>{% for flag in relay['flags'] %}{% if flag != 'StaleDesc' %}<a href="{{ path_prefix }}flag/{{ flag.lower()|escape }}"><img src="{{ path_prefix}}static/images/flags/{{ flag.lower()|escape }}.png" title="{{ flag|escape }}" alt="{{ flag|escape }}"></a> {% endif %}{% endfor %}</td>
-
-            {% if relay['running'] %}
-            <td class="visible-md visible-lg"><font color="green">True</font></td>
-            {% else %}
-            <td class="visible-md visible-lg"><font color="red">False</font></td>
-            {% endif %}
 
             {% if key != 'first_seen' %}
             <td class="visible-md visible-lg"><a href="{{ path_prefix }}first_seen/{{ relay['first_seen'].split(' ', 1)[0]|escape }}">{{ relay['first_seen'].split(' ', 1)[0]|escape }}</a></td>
