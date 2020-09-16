@@ -7,13 +7,25 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="{{ path_prefix }}static/css/bootstrap.min.css">
-    <!--colors from metrics.torproject.org-->
+    <!--source: metrics.torproject.org-->
     <style>
-		.relay-online {
-			color: #25d918;
+		.circle {
+			display: inline-block;
+			vertical-align: middle;
+			background: #999999;
+			width: 7px;
+			height: 7px;
+			-moz-border-radius: 50%;
+			-webkit-border-radius: 50%;
+			border-radius: 50%;
 		}
-		.relay-offline {
-			color: #ff1515;
+
+		.circle-online {
+			background: #25d918;
+		}
+
+		.circle-offline {
+			background: #ff1515;
 		}
         .verified-hostname {
             color: #FE9F30;

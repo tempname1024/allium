@@ -28,9 +28,9 @@
             {% set obs_bandwidth = '%s %s'|format((relay['observed_bandwidth'] / 1000)|round(2, 'common'), 'KB/s') %}{% endif %}
 
             {% if relay['running'] %}
-            <td class="relay-online" title="This relay is online">⚫</td>
+            <td><span class="circle circle-online" title="This relay is online"></span></td>
             {% else %}
-            <td class="relay-offline" title="This relay is offline">⚫</td>
+            <td><span class="circle circle-offline" title="This relay is offline"></span></td>
             {% endif %}
 
             {% if key != 'family' and relay['effective_family']|length > 1 %}
