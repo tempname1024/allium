@@ -36,12 +36,12 @@
             {% else %}
             {% set obs_bandwidth = '%s %s'|format((v['bandwidth'] / 1000)|round(2, 'common'), 'KB/s') %}{% endif %}
 
-            <td><a href="{{ path_prefix}}family/{{ k|escape }}/">{{ k|escape }}</a></td>
+            <td><code><a href="{{ path_prefix}}family/{{ k|escape }}/">{{ k|escape }}</a></code></td>
 
             <td>{{ obs_bandwidth }}</td>
 
             {% if v['contact'] %}
-            <td class="visible-md visible-lg"><a href="{{ path_prefix }}contact/{{ v['contact']|hash }}/" title="{{ v['contact']|escape }}">{{ v['contact']|truncate(50)|escape }}<a></td>
+            <td class="visible-md visible-lg"><code><a href="{{ path_prefix }}contact/{{ v['contact']|hash }}/" title="{{ v['contact']|escape }}">{{ v['contact']|truncate(50)|escape }}<a></td></code>
             {% else %}
             <td>none</td>{% endif %}
 
