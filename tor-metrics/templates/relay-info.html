@@ -24,7 +24,7 @@
 
             <dt>Dir Address</dt>
             {% if relay['dir_address'] %}
-                <dd>{{ relay['dir_address']|escape }}</dd>
+                <dd><a href="http://{{ relay['dir_address']|escape }}">{{ relay['dir_address']|escape }}</a></dd>
             {% else %}
                 <dd>none</dd>
             {% endif %}
