@@ -33,7 +33,7 @@
             <td><span class="circle circle-offline" title="This relay is offline"></span></td>
             {% endif %}
 
-            {% if key != 'family' and relay['effective_family']|length > 1 %}
+            {% if relay['effective_family']|length > 1 %}
             <td title="{{ relay['nickname']|escape }}"><a href="{{ path_prefix }}relay/{{ relay['fingerprint']|escape }}.html">{{ relay['nickname']|truncate(10)|escape }}</a> (<a href="{{ path_prefix }}family/{{ relay['fingerprint']|escape }}/">{{ relay['effective_family']|length }}</a>)</td>
             {% else %}
             <td title="{{ relay['nickname']|escape }}"><a href="{{ path_prefix}}relay/{{ relay['fingerprint']|escape }}.html">{{ relay['nickname']|truncate(15)|escape }}</a></td>
