@@ -2,6 +2,6 @@
 *.swo
 *.sh
 sandbox
-tor-metrics/__pycache__
-tor-metrics/www
-tor-metrics/timestamp
+allium/__pycache__
+allium/www
+allium/timestamp
