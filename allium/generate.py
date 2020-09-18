@@ -20,7 +20,7 @@ ABS_PATH = os.path.dirname(os.path.abspath(__file__))
 if __name__ == '__main__':
     RELAY_SET = Relays()
 
-    # generate relay HTML documents
+    # index/all HTML relay sets, index set limited to 500 relays
     RELAY_SET.create_output_dir()
     RELAY_SET.write_misc(
         template    = 'index.html',
@@ -32,53 +32,34 @@ if __name__ == '__main__':
         template  = 'all.html',
         path      = 'misc/all.html'
     )
-    RELAY_SET.write_misc(
-        template  = 'misc-families.html',
-        path      = 'misc/families-by-bandwidth.html',
-        sorted_by = '1.bandwidth'
-    )
-    RELAY_SET.write_misc(
-        template  = 'misc-families.html',
-        path      = 'misc/families-by-exit-count.html',
-        sorted_by = '1.exit_count,1.bandwidth'
-    )
-    RELAY_SET.write_misc(
-        template  = 'misc-families.html',
-        path      = 'misc/families-by-middle-count.html',
-        sorted_by = '1.middle_count,1.bandwidth'
-    )
-    RELAY_SET.write_misc(
-        template  = 'misc-families.html',
-        path      = 'misc/families-by-first-seen.html',
-        sorted_by = '1.first_seen,1.bandwidth'
-    )
-    RELAY_SET.write_misc(
-        template  = 'misc-networks.html',
-        path      = 'misc/networks-by-bandwidth.html',
-        sorted_by = '1.bandwidth'
-    )
-    RELAY_SET.write_misc(
-        template  = 'misc-networks.html',
-        path      = 'misc/networks-by-exit-count.html',
-        sorted_by = '1.exit_count,1.bandwidth'
-    )
-    RELAY_SET.write_misc(
-        template  = 'misc-networks.html',
-        path      = 'misc/networks-by-middle-count.html',
-        sorted_by = '1.middle_count,1.bandwidth'
-    )
-    RELAY_SET.write_misc(
-        template  = 'misc-networks.html',
-        path      = 'misc/networks-by-first-seen.html',
-        sorted_by = '1.first_seen,1.bandwidth'
-    )
-    RELAY_SET.write_pages_by_key('as')
-    RELAY_SET.write_pages_by_key('contact')
-    RELAY_SET.write_pages_by_key('country')
-    RELAY_SET.write_pages_by_key('family')
-    RELAY_SET.write_pages_by_key('flag')
-    RELAY_SET.write_pages_by_key('platform')
-    RELAY_SET.write_pages_by_key('first_seen')
+
+    # 'page suffix': 'sorted-by str list'
+    misc_pages = {
+        'by-bandwidth': '1.bandwidth',
+        'by-exit-count': '1.exit_count,1.bandwidth',
+        'by-middle-count': '1.middle_count,1.bandwidth',
+        'by-first-seen': '1.first_seen,1.bandwidth'
+    }
+    for k, v in misc_pages.items():
+        RELAY_SET.write_misc(
+            template  = 'misc-families.html',
+            path      = 'misc/families-{}.html'.format(k),
+            sorted_by = v
+        )
+        RELAY_SET.write_misc(
+            template  = 'misc-networks.html',
+            path      = 'misc/networks-{}.html'.format(k),
+            sorted_by = v
+        )
+
+    # onionoo keys to generate pages by unique value
+    keys = ['as', 'contact', 'country', 'family', 'flag', 'platform',
+            'first_seen']
+
+    for k in keys:
+        RELAY_SET.write_pages_by_key(k)
+
+    # per-relay info pages
     RELAY_SET.write_relay_info()
 
     # copy static directory and its contents
