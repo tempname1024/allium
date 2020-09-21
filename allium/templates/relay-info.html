@@ -1,176 +1,192 @@
-{% extends "skeleton.html" %}
-{% block title %}Tor Relays :: {{ relay['nickname'] }}{% endblock %}
-{% block body %}
+{% extends "skeleton.html" -%}
+{% block title -%}Tor Relays :: {{ relay['nickname'] }}{% endblock -%}
+{% block body -%}
 <div id="content">
 <h2><a href="{{ path_prefix }}">Home</a> :: Relay "{{ relay['nickname'] }}"</h2>
 <div class="row">
-    <div class="col-md-6">
-        <dl>
-            <dt>Nickname</dt>
-            <dd>{{ relay['nickname']|escape }}</dd>
+<div class="col-md-6">
+<dl>
+<dt>Nickname</dt>
+<dd>{{ relay['nickname']|escape }}</dd>
 
-            <dt>OR Address</dt>
-            <dd><pre class="pre-scrollable">{% for address in relay['or_addresses'] -%}
-                {{ address }}
-            {% endfor -%}
-            </pre></dd>
+<dt>OR Address</dt>
+<dd><pre class="pre-scrollable">{% for address in relay['or_addresses'] -%}
+{{ address }}
+{% endfor -%}
+</pre></dd>
 
-            <dt>Contact</dt>
-            {% if relay['contact'] %}
-                <dd><a href="{{ path_prefix }}contact/{{ relay['contact']|hash }}">{{ relay['contact']|escape }}</a></dd>
-            {% else %}
-                <dd><a href="{{ path_prefix }}contact/{{ ''|hash }}">none</a></dd>
-            {% endif %}
+<dt>Contact</dt>
+{% if relay['contact'] -%}
+<dd><a href="{{ path_prefix }}contact/{{ relay['contact']|hash }}">{{
+relay['contact']|escape }}</a></dd>
+{% else -%}
+<dd><a href="{{ path_prefix }}contact/{{ ''|hash }}">none</a></dd>
+{% endif -%}
 
-            <dt>Dir Address</dt>
-            {% if relay['dir_address'] %}
-                <dd><a href="http://{{ relay['dir_address']|escape }}">{{ relay['dir_address']|escape }}</a></dd>
-            {% else %}
-                <dd>none</dd>
-            {% endif %}
+<dt>Dir Address</dt>
+{% if relay['dir_address'] -%}
+<dd><a href="http://{{ relay['dir_address']|escape }}">{{
+relay['dir_address']|escape }}</a></dd>
+{% else -%}
+<dd>none</dd>
+{% endif -%}
 
-            <dt>Exit Address</dt>
-            {% if relay['exit_address'] %}
-                <dd>{{ relay['exit_address']|escape }}</dd>
-            {% else %}
-                <dd>none</dd>
-            {% endif %}
+<dt>Exit Address</dt>
+{% if relay['exit_address'] -%}
+<dd>{{ relay['exit_address']|escape }}</dd>
+{% else -%}
+<dd>none</dd>
+{% endif -%}
 
-            <dt>Observed Bandwidth</dt>
-            {% if relay['observed_bandwidth'] > 1000000 %}
-            {% set obs_bandwidth = '%s %s'|format((relay['observed_bandwidth'] / 1000000)|round(2, 'common'), 'MB/s') %}
-            {% else %}
-            {% set obs_bandwidth = '%s %s'|format((relay['observed_bandwidth'] / 1000)|round(2, 'common'), 'KB/s') %}{% endif %}
-            <dd>{{ obs_bandwidth }}</dd>
+<dt>Observed Bandwidth</dt>
+{% if relay['observed_bandwidth'] > 1000000 -%}
+{% set obs_bandwidth = '%s %s'|format((relay['observed_bandwidth']
+/ 1000000)|round(2, 'common'), 'MB/s') -%}
+{% else -%}
+{% set obs_bandwidth = '%s %s'|format((relay['observed_bandwidth']
+/ 1000)|round(2, 'common'), 'KB/s') -%}{% endif -%}
+<dd>{{ obs_bandwidth }}</dd>
 
-            <dt>IPv4 Exit Policy Summary</dt>
-            <dd>
-            {% if relay['exit_policy_summary'] -%}
-                {%- set v4_summary = relay['exit_policy_summary'].items() -%}
-                <pre class="pre-scrollable">{% for k, v in v4_summary -%}
-                    {{ k|escape }}: {{ '\n  ' + v|join('\n  ')|escape }}
-                {% endfor -%}
-                </pre>
-            {% else -%}
-                <pre>none</pre>
-            {% endif -%}
-            </dd>
+<dt>IPv4 Exit Policy Summary</dt>
+<dd>
+{% if relay['exit_policy_summary'] -%}
+{%- set v4_summary = relay['exit_policy_summary'].items() -%}
+<pre class="pre-scrollable">{% for k, v in v4_summary -%}
+{{ k|escape }}: {{ '\n  ' + v|join('\n  ')|escape }}
+{% endfor -%}
+</pre>
+{% else -%}
+<pre>none</pre>
+{% endif -%}
+</dd>
 
-            <dt>IPv6 Exit Policy Summary</dt>
-            <dd>
-            {% if relay['exit_policy_v6_summary'] -%}
-                {%- set v6_summary = relay['exit_policy_v6_summary'].items() -%}
-                <pre class="pre-scrollable">{% for k, v in v6_summary -%}
-                    {{ k|escape }}: {{ '\n  ' + v|join('\n  ')|escape }}
-                {% endfor -%}
-                </pre>
-            {% else -%}
-                <pre>none</pre>
-            {% endif -%}
-            </dd>
+<dt>IPv6 Exit Policy Summary</dt>
+<dd>
+{% if relay['exit_policy_v6_summary'] -%}
+{%- set v6_summary = relay['exit_policy_v6_summary'].items() -%}
+<pre class="pre-scrollable">{% for k, v in v6_summary -%}
+{{ k|escape }}: {{ '\n  ' + v|join('\n  ')|escape }}
+{% endfor -%}
+</pre>
+{% else -%}
+<pre>none</pre>
+{% endif -%}
+</dd>
 
-            <dt>Exit Policy</dt>
-            <dd><pre class="pre-scrollable">{% for policy in relay['exit_policy'] -%}
-                {{ policy|escape }}
-            {% endfor -%}
-            </pre></dd>
+<dt>Exit Policy</dt>
+<dd><pre class="pre-scrollable">{% for policy in relay['exit_policy'] -%}
+{{ policy|escape }}
+{% endfor -%}
+</pre></dd>
 
-            {% if relay['effective_family']|length > 1 -%}
-                <dt>Effective Family Members (<a href="{{ path_prefix }}family/{{ relay['fingerprint']|escape }}">view</a>)</dt>
-            {% else %}
-                <dt>Effective Family Members</dt>
-            {% endif %}
-            <dd><pre class="pre-scrollable">{% for e_relay in relay['effective_family'] -%}
-                {% if relay['effective_family']|length > 1 -%}
-                <a href="{{ e_relay|escape }}.html">{{ e_relay|escape }}</a>
-                {% else -%}
-                {{ e_relay|escape }}
-                {% endif -%}
-            {% endfor -%}
-            </pre></dd>
+{% if relay['effective_family']|length > 1 -%}
+<dt>Effective Family Members (<a href="{{ path_prefix }}family/{{
+relay['fingerprint']|escape }}">view</a>)</dt>
+{% else -%}
+<dt>Effective Family Members</dt>
+{% endif -%}
+<dd><pre class="pre-scrollable">{% for e_relay in relay['effective_family'] -%}
+{% if relay['effective_family']|length > 1 -%}
+<a href="{{ e_relay|escape }}.html">{{ e_relay|escape }}</a>
+{% else -%}
+{{ e_relay|escape }}
+{% endif -%}
+{% endfor -%}
+</pre></dd>
 
-            <dt>Alleged Family Members</dt>
-            <dd>
-            {% if relay['alleged_family'] %}
-                <pre class="pre-scrollable">{% for a_relay in relay['alleged_family'] -%}
-                    {% if relay['alleged_family']|length > 1 -%}
-                    <a href="{{ a_relay|escape }}.html">{{ a_relay|escape }}</a>
-                    {% else -%}
-                    {{ a_relay|escape }}
-                    {% endif -%}
-                {% endfor %}
-            {% else -%}
-                <pre class="pre-scrollable">none
-            {% endif -%}
-            </pre></dd>
-        </dl>
-    </div>
-    <div class="col-md-6">
-        <dl>
-            <dt>Fingerprint</dt>
-            <dd><pre>{{ relay['fingerprint']|escape }}</pre></dd>
+<dt>Alleged Family Members</dt>
+<dd>
+{% if relay['alleged_family'] -%}
+<pre class="pre-scrollable">{% for a_relay in relay['alleged_family'] -%}
+{% if relay['alleged_family']|length > 1 -%}
+<a href="{{ a_relay|escape }}.html">{{ a_relay|escape }}</a>
+{% else -%}
+{{ a_relay|escape }}
+{% endif -%}
+{% endfor -%}
+{% else -%}
+<pre class="pre-scrollable">none
+{% endif -%}
+</pre></dd>
+</dl>
+</div>
+<div class="col-md-6">
+<dl>
+<dt>Fingerprint</dt>
+<dd><pre>{{ relay['fingerprint']|escape }}</pre></dd>
 
-            <dt>Flags</dt>
-            <dd>
-            {% for flag in relay['flags'] %}
-                {% if flag != 'StaleDesc' %}
-                <a href="{{ path_prefix }}flag/{{ flag.lower()|escape }}"><img src="{{ path_prefix}}static/images/flags/{{ flag.lower()|escape }}.png" title="{{ flag|escape }}" alt="{{ flag|escape }}"></a> {{ flag|escape }}
-                {% endif %}
-            {% endfor %}
-            </dd>
+<dt>Flags</dt>
+<dd>
+{% for flag in relay['flags'] -%}
+{% if flag != 'StaleDesc' -%}
+<a href="{{ path_prefix }}flag/{{ flag.lower()|escape }}"><img src="{{
+path_prefix}}static/images/flags/{{ flag.lower()|escape }}.png" title="{{
+flag|escape }}" alt="{{ flag|escape }}"></a> {{ flag|escape }}
+{% endif -%}
+{% endfor -%}
+</dd>
 
-            <dt>Host Name</dt>
-            <dd>
-            {% if relay['verified_host_names'] -%}
-                <pre class="verified-hostname" title="verified hostname">{{ relay['verified_host_names']|join('\n')|escape }}</pre>
-            {% elif relay['unverified_host_names'] -%}
-                <pre class="unverified-hostname" title="unverified hostname">{{ relay['unverified_host_names']|join('\n')|escape }}</pre>
-            {% else -%}
-                <pre>none</pre>
-            {% endif -%}
+<dt>Host Name</dt>
+<dd>
+{% if relay['verified_host_names'] -%}
+<pre class="verified-hostname" title="verified hostname">{{
+relay['verified_host_names']|join('\n')|escape }}</pre>
+{% elif relay['unverified_host_names'] -%}
+<pre class="unverified-hostname" title="unverified hostname">{{
+relay['unverified_host_names']|join('\n')|escape }}</pre>
+{% else -%}
+<pre>none</pre>
+{% endif -%}
 
-            <dt>Country</dt>
-            <dd>
-            {% if relay['country'] -%}
-                <a href="{{ path_prefix }}country/{{ relay['country']|escape }}/"><img src="{{ path_prefix }}static/images/cc/{{ relay['country']|escape }}.png" title="{{ relay['country_name']|escape }}" alt="{{ relay['country_name']|escape }}"></a> {{ relay['country_name']|escape }}
-            {% else -%}
-                unknown
-            {% endif %}
-            </dd>
+<dt>Country</dt>
+<dd>
+{% if relay['country'] -%}
+<a href="{{ path_prefix }}country/{{ relay['country']|escape }}/"><img src="{{
+path_prefix }}static/images/cc/{{ relay['country']|escape }}.png" title="{{
+relay['country_name']|escape }}" alt="{{ relay['country_name']|escape
+}}"></a> {{ relay['country_name']|escape }}
+{% else -%}
+unknown
+{% endif -%}
+</dd>
 
-            <dt>AS Number</dt>
-            <dd>
-            {% if relay['as'] %}
-                <a href='{{ path_prefix }}as/{{ relay['as']|escape }}'>{{ relay['as']|escape }}</a>
-            {% else %}
-                unknown
-            {% endif %}
+<dt>AS Number</dt>
+<dd>
+{% if relay['as'] -%}
+<a href='{{ path_prefix }}as/{{ relay['as']|escape }}'>{{ relay['as']|escape
+}}</a>
+{% else -%}
+unknown
+{% endif -%}
 
-            <dt>AS Name</dt>
-            <dd>
-            {% if relay['as_name'] -%}
-                {{ relay['as_name']|escape }} (<a href='https://bgp.he.net/{{ relay['as']|escape }}'>BGP</a>)
-            {% else -%}
-                unknown
-            {% endif -%}
+<dt>AS Name</dt>
+<dd>
+{% if relay['as_name'] -%}
+{{ relay['as_name']|escape }} (<a href='https://bgp.he.net/{{ relay['as']|escape
+}}'>BGP</a>)
+{% else -%}
+unknown
+{% endif -%}
 
-            <dt>First Seen</dt>
-            <dd><a href="{{ path_prefix }}first_seen/{{ relay['first_seen'].split(' ', 1)[0]|escape }}">{{ relay['first_seen']|escape }}</a></dd>
+<dt>First Seen</dt>
+<dd><a href="{{ path_prefix }}first_seen/{{ relay['first_seen'].split(' ',
+1)[0]|escape }}">{{ relay['first_seen']|escape }}</a></dd>
 
-            <dt>Last Restarted</dt>
-            <dd>{{ relay['last_restarted']|escape }}</dd>
+<dt>Last Restarted</dt>
+<dd>{{ relay['last_restarted']|escape }}</dd>
 
-            <dt>Consensus Weight</dt>
-            <dd>{{ relay['consensus_weight_fraction']|escape }} ({{ relay['consensus_weight']|escape }})</dd>
+<dt>Consensus Weight</dt>
+<dd>{{ relay['consensus_weight_fraction']|escape }} ({{
+relay['consensus_weight']|escape }})</dd>
 
-            <dt>Platform</dt>
-            <dd>
-            <a href='{{ path_prefix}}platform/{{ relay['platform']|escape }}'>{{
-            relay['platform'] }}</a>
-            </dd>
+<dt>Platform</dt>
+<dd>
+<a href='{{ path_prefix}}platform/{{ relay['platform']|escape }}'>{{
+relay['platform'] }}</a>
+</dd>
 
-        </dl>
-    </div>
+</dl>
 </div>
 </div>
-{% endblock %}
+</div>
+{% endblock -%}
