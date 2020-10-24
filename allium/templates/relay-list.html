@@ -14,7 +14,7 @@
 <th>AS Name</th>
 <th>Country</th>
 <th>Platform</th>
-<th>Flags</th>
+<th class="visible-md visible-lg">Flags</th>
 <th class="visible-md visible-lg">First Seen</th>
 </tr>
 <tbody>
@@ -105,7 +105,7 @@ relay['platform']|truncate(length=10)|escape }}</a></td>
 <td>{{ relay['platform']|truncate(length=10)|escape }}</td>
 {% endif -%}
 
-<td>{% for flag in relay['flags'] -%}{% if flag != 'StaleDesc' -%}<a href="{{
+<td class="visible-md visible-lg">{% for flag in relay['flags'] -%}{% if flag != 'StaleDesc' -%}<a href="{{
 path_prefix }}flag/{{ flag.lower()|escape }}"><img src="{{
 path_prefix}}static/images/flags/{{ flag.lower()|escape }}.png"
 title="{{ flag|escape }}" alt="{{ flag|escape }}"></a> {% endif -%}{% endfor

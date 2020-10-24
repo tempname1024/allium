@@ -59,7 +59,7 @@ reverse=True) -%}
 v['contact']|hash }}/" title="{{ v['contact']|escape }}">{{
 v['contact']|truncate(50)|escape }}<a></td></code>
 {% else -%}
-<td>none</td>
+<td class="visible-md visible-lg">none</td>
 {% endif -%}
 
 <td>{{ v['exit_count'] }} / {{ v['middle_count'] }}</td>
