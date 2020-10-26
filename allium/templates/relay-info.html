@@ -17,10 +17,10 @@
 
 <dt>Contact</dt>
 {% if relay['contact'] -%}
-<dd><a href="{{ path_prefix }}contact/{{ relay['contact']|hash }}">{{
+<dd><a href="{{ path_prefix }}contact/{{ relay['contact_md5'] }}">{{
 relay['contact']|escape }}</a></dd>
 {% else -%}
-<dd><a href="{{ path_prefix }}contact/{{ ''|hash }}">none</a></dd>
+<dd><a href="{{ path_prefix }}contact/{{ relay['contact_md5'] }}">none</a></dd>
 {% endif -%}
 
 <dt>Dir Address</dt>

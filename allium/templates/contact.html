@@ -1,10 +1,9 @@
 {% extends "relay-list.html" %}
+{% set contact_hash = relays.json['relay_subset'][0]['contact_md5'] %}
 {% if relays.json['relay_subset'][0]['contact'] %}
     {% set contact = relays.json['relay_subset'][0]['contact']|escape %}
-    {% set contact_hash = relays.json['relay_subset'][0]['contact']|hash %}
 {% else %}
     {% set contact = 'none' %}
-    {% set contact_hash = ''|hash %}
 {% endif %}
 {% block title %}Tor Relays :: Contact {{ contact_hash }}{% endblock %}
 {% block header %}<a href="../../">Home</a> :: Contact {{ contact_hash }}{%

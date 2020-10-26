@@ -56,7 +56,7 @@ reverse=True) -%}
 
 {% if v['contact'] -%}
 <td class="visible-md visible-lg"><code><a href="{{ path_prefix }}contact/{{
-v['contact']|hash }}/" title="{{ v['contact']|escape }}">{{
+v['contact_md5'] }}/" title="{{ v['contact']|escape }}">{{
 v['contact']|truncate(50)|escape }}<a></td></code>
 {% else -%}
 <td class="visible-md visible-lg">none</td>

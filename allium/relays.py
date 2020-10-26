@@ -20,27 +20,6 @@ ABS_PATH = os.path.dirname(os.path.abspath(__file__))
 ENV = Environment(loader=FileSystemLoader(os.path.join(ABS_PATH, 'templates')),
                   trim_blocks=True, lstrip_blocks=True)
 
-def hash_filter(value, hash_type='md5'):
-    '''
-    Custom hash filter for jinja; defaults to "md5" if no type specified
-
-    :param value: value to be hashed
-    :param hash_type: valid hash type
-    :return: computed hash as a hexadecimal string
-    '''
-    hash_func = getattr(hashlib, hash_type, None)
-
-    if hash_func:
-        computed_hash = hash_func(value.encode('utf-8')).hexdigest()
-    else:
-        raise AttributeError(
-            'No hashing function named {hname}'.format(hname=hash_type)
-        )
-
-    return computed_hash
-
-ENV.filters['hash'] = hash_filter
-
 class Relays:
     '''
     Relay class consisting of relays (list of dict) and onionoo fetch timestamp
@@ -58,6 +37,7 @@ class Relays:
         self._fix_missing_observed_bandwidth()
         self._sort_by_bandwidth()
         self._trim_platform()
+        self._add_hashed_contact()
         self._categorize()
 
     def _fetch_onionoo_details(self):
@@ -103,6 +83,14 @@ class Relays:
         for idx, relay in enumerate(self.json['relays']):
             if not relay.get('observed_bandwidth'):
                 self.json['relays'][idx]['observed_bandwidth'] = 0
+
+    def _add_hashed_contact(self):
+        '''
+        Adds a hashed contact key/value for every relay
+        '''
+        for idx, relay in enumerate(self.json['relays']):
+            c = relay.get('contact', '').encode('utf-8')
+            self.json['relays'][idx]['contact_md5'] = hashlib.md5(c).hexdigest()
 
     def _sort_by_bandwidth(self):
         '''
