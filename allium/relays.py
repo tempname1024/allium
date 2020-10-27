@@ -149,6 +149,7 @@ class Relays:
 
         if k is 'family':
             self.json['sorted'][k][v]['contact'] = relay.get('contact')
+            self.json['sorted'][k][v]['contact_md5'] = relay.get('contact_md5')
 
             # update the first_seen parameter to always contain the oldest
             # relay's first_seen date
