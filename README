@@ -8,7 +8,17 @@ allium: statically generated tor metrics and statistics - https://yui.cat/
   primary goals of the project are to be fast (static), use few API queries
   (one), and to present information in a condensed, readable format
 
+  INSTALL
+
+    $ pip install -r requirements.txt
+    $ cd allium
+    $ ./generate.py
+
+    Files will be generated in the ./www directory by default, configurable by
+    editing config.py; the only non-standard dependency is Jinja2>=2.11.2
+
   TODO
+
     - top exit/guard/relay families (see https://nusenu.github.io/OrNetStats/)
     - interesting statistics (ASN exit concentration, IPv6-supporting relays)
     - implement something similar to https://metrics.torproject.org/bubbles.html
