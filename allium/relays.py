@@ -22,11 +22,7 @@ ENV = Environment(loader=FileSystemLoader(os.path.join(ABS_PATH, 'templates')),
 
 class Relays:
     '''
-    Relay class consisting of relays (list of dict) and onionoo fetch timestamp
-
-    :ts_file: absolute path to timestamp file used in setting If-Modified_since
-    :json: relay listings stored as a list of dict, derived from onionoo JSON
-    :timestamp: timestamp of onionoo fetch
+    Relay class consisting of processing routines and onionoo data
     '''
     def __init__(self):
         self.url = config.CONFIG['onionoo_url']
@@ -42,9 +38,8 @@ class Relays:
 
     def _fetch_onionoo_details(self):
         '''
-        Make request to onionoo to retrieve details document, return prepared
-        JSON response (trimmed platform and sorted by highest observed
-        bandwidth)
+        Make request to onionoo to retrieve details document, return  JSON
+        response
         '''
         if os.path.isfile(self.ts_file):
             with open(self.ts_file, 'r') as ts_file:
@@ -118,15 +113,18 @@ class Relays:
         '''
         Populate self.sorted dictionary with values from :relay:
 
-        :relay: relay from which values are derived
-        :idx: index at which the relay can be found in self.json['relays']
-        :k: the name of the key to use in self.sorted
-        :v: the name of the subkey to use in self.sorted[k]
+        Args:
+            relay: relay from which values are derived
+            idx:   index at which the relay can be found in self.json['relays']
+            k:     the name of the key to use in self.sorted
+            v:     the name of the subkey to use in self.sorted[k]
         '''
         if not v or not re.match(r'^[A-Za-z0-9_-]+$', v):
             return
+
         if not k in self.json['sorted']:
             self.json['sorted'][k] = dict()
+
         if not v in self.json['sorted'][k]:
             self.json['sorted'][k][v] = {
                 'relays':       list(),
@@ -134,9 +132,11 @@ class Relays:
                 'exit_count':   0,
                 'middle_count': 0
             }
+
         bw = relay['observed_bandwidth']
         self.json['sorted'][k][v]['relays'].append(idx)
         self.json['sorted'][k][v]['bandwidth'] += bw
+
         if 'Exit' in relay['flags']:
             self.json['sorted'][k][v]['exit_count'] += 1
         else:
@@ -164,6 +164,7 @@ class Relays:
         discovered relays with attributes we use to generate static sets
         '''
         self.json['sorted'] = dict()
+
         for idx, relay in enumerate(self.json['relays']):
             keys = ['as', 'country', 'platform']
             for key in keys:
@@ -194,12 +195,13 @@ class Relays:
         '''
         Render and write unsorted HTML listings to disk
 
-        :template:    jinja template name
-        :path_prefix: path to prefix other docs/includes
-        :path:        path to generate HTML document
-        :sorted_by:   key to sort by, used in family and networks pages
-        :reverse:     passed to sort() function in family and networks pages
-        :is_index:    whether document is main index listing, limits list to 500
+        Args:
+            template:    jinja template name
+            path:        path to generate HTML document
+            path_prefix: path to prefix other docs/includes
+            sorted_by:   key to sort by, used in family and networks pages
+            reverse:     passed to sort() function in family and networks pages
+            is_index:    whether document is main index listing, limits list to 500
         '''
         template = ENV.get_template(template)
         self.json['relay_subset'] = self.json['relays']
@@ -212,26 +214,34 @@ class Relays:
         )
         output = os.path.join(config.CONFIG['output_root'], path)
         os.makedirs(os.path.dirname(output), exist_ok=True)
+
         with open(output, 'w', encoding='utf8') as html:
             html.write(template_render)
 
     def write_pages_by_key(self, k):
         '''
-        Render and write HTML listings to disk sorted by :k:
+        Render and write sorted HTML relay listings to disk
+
+        Args:
+            k: onionoo key to sort by (as, country, platform...)
         '''
         template = ENV.get_template(k + '.html')
         output_path = os.path.join(config.CONFIG['output_root'], k)
+
         if os.path.exists(output_path):
             rmtree(output_path)
+
         for v in self.json['sorted'][k]:
             i = self.json['sorted'][k][v]
             members = []
+
             for m_relay in i['relays']:
                 members.append(self.json['relays'][m_relay])
             if k is 'flag':
                 dir_path = os.path.join(output_path, v.lower())
             else:
                 dir_path = os.path.join(output_path, v)
+
             os.makedirs(dir_path)
             self.json['relay_subset'] = members
             rendered = template.render(
@@ -245,6 +255,7 @@ class Relays:
                 value        = v,
                 sp_countries = countries.THE_PREFIXED
             )
+
             with open(os.path.join(dir_path, 'index.html'), 'w',
                       encoding='utf8') as html:
                 html.write(rendered)
@@ -256,9 +267,11 @@ class Relays:
         relay_list = self.json['relays']
         template = ENV.get_template('relay-info.html')
         output_path = os.path.join(config.CONFIG['output_root'], 'relay')
+
         if os.path.exists(output_path):
             rmtree(output_path)
         os.makedirs(output_path)
+
         for relay in relay_list:
             if not relay['fingerprint'].isalnum():
                 continue

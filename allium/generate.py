@@ -18,9 +18,10 @@ from relays import Relays
 ABS_PATH = os.path.dirname(os.path.abspath(__file__))
 
 if __name__ == '__main__':
+    # object containing onionoo data and processing routines
     RELAY_SET = Relays()
 
-    # index/all HTML relay sets, index set limited to 500 relays
+    # index and "all" HTML relay sets; index set limited to 500 relays
     RELAY_SET.create_output_dir()
     RELAY_SET.write_misc(
         template    = 'index.html',
@@ -33,13 +34,15 @@ if __name__ == '__main__':
         path      = 'misc/all.html'
     )
 
-    # 'page suffix': 'sorted-by str list'
+    # miscellaneous page filename suffixes and sorted-by keys
     misc_pages = {
         'by-bandwidth': '1.bandwidth',
         'by-exit-count': '1.exit_count,1.bandwidth',
         'by-middle-count': '1.middle_count,1.bandwidth',
         'by-first-seen': '1.first_seen,1.bandwidth'
     }
+
+    # write miscellaneous-sorted (per misc_pages) HTML pages
     for k, v in misc_pages.items():
         RELAY_SET.write_misc(
             template  = 'misc-families.html',
@@ -62,8 +65,9 @@ if __name__ == '__main__':
     # per-relay info pages
     RELAY_SET.write_relay_info()
 
-    # copy static directory and its contents
     STATIC_SRC_PATH = os.path.join(ABS_PATH, 'static')
     STATIC_DEST_PATH = os.path.join(config.CONFIG['output_root'], 'static')
+
+    # copy static directory and its contents if it doesn't exist
     if not os.path.exists(STATIC_DEST_PATH):
         copytree(STATIC_SRC_PATH, STATIC_DEST_PATH)
