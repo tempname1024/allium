@@ -1,32 +1,40 @@
-allium: statically generated tor metrics and statistics - https://yui.cat/
+allium: generate static tor relay metrics and statistics
 
-  allium generates a set of HTML documents which represent the total set of tor
-  relays at the time of execution
+usage: allium.py [-h] [--out] [--onionoo-url]
 
-  allium is heavily inspired by the official tor metrics project[0] and serves
-  as a javascript-free, statically-generated clean room implementation. the
-  primary goals of the project are to be fast (static), use few API queries
-  (one), and to present information in a condensed, readable format
+optional arguments:
+  -h, --help     show this help message and exit
+  --out          directory to store rendered files (default "./www")
+  --onionoo-url  onionoo HTTP URL (default
+                 "https://onionoo.torproject.org/details")
 
-  INSTALL
+ABOUT
 
-    $ pip install -r requirements.txt
-    $ cd allium
-    $ ./generate.py
+allium generates a set of HTML documents which represent the total set of tor
+relays at the time of execution
 
-    Files will be generated in the ./www directory by default, configurable by
-    editing config.py; the only non-standard dependency is Jinja2>=2.11.2
+allium is heavily inspired by the official tor metrics project[0] and serves
+as a javascript-free, statically-generated clean room implementation. the
+primary goals of the project are to be fast (static), use few API queries
+(one), and to present information in a condensed, readable format
 
-  TODO
+REQUIRES
 
-    - top exit/guard/relay families (see https://nusenu.github.io/OrNetStats/)
-    - interesting statistics (ASN exit concentration, IPv6-supporting relays)
-    - implement something similar to https://metrics.torproject.org/bubbles.html
+* python3
+* Jinja2>=2.11.2
 
-  note: this project includes country flags from GoSquared[1] and relay flags
-  from the Tor Project[2], the licenses of which are included in this project's
-  root directory
+INSTALL
 
-  [0] https://metrics.torproject.org/
-  [1] https://github.com/gosquared/flags
-  [2] https://www.torproject.org/
+$ pip install -r requirements.txt
+$ cd allium
+$ ./allium.py
+
+LICENSE
+
+this project includes country flags from GoSquared[1] and relay flags from the
+Tor Project[2], the licenses of which are included in this project's root
+directory; all code is published under UNLICENSE (public domain)
+
+[0] https://metrics.torproject.org/
+[1] https://github.com/gosquared/flags
+[2] https://www.torproject.org/

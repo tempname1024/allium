@@ -2,6 +2,6 @@
 *.swo
 *.sh
 sandbox
-allium/__pycache__
+__pycache__
+timestamp
 allium/www
-allium/timestamp

@@ -12,21 +12,20 @@ import re
 import time
 import urllib.request
 from shutil import rmtree
-import config
-import countries
 from jinja2 import Environment, FileSystemLoader
 
 ABS_PATH = os.path.dirname(os.path.abspath(__file__))
-ENV = Environment(loader=FileSystemLoader(os.path.join(ABS_PATH, 'templates')),
+ENV = Environment(loader=FileSystemLoader(os.path.join(ABS_PATH, '../templates')),
                   trim_blocks=True, lstrip_blocks=True)
 
-class Relays:
+class Relays():
     '''
     Relay class consisting of processing routines and onionoo data
     '''
-    def __init__(self):
-        self.url = config.CONFIG['onionoo_url']
-        self.ts_file = os.path.join(ABS_PATH, "timestamp")
+    def __init__(self, output_dir, onionoo_url):
+        self.output_dir = output_dir
+        self.onionoo_url = onionoo_url
+        self.ts_file = os.path.join(os.path.dirname(ABS_PATH), "timestamp")
         self.json = self._fetch_onionoo_details()
         self.timestamp = self._write_timestamp()
 
@@ -45,9 +44,9 @@ class Relays:
             with open(self.ts_file, 'r') as ts_file:
                 prev_timestamp = ts_file.read()
             headers = {"If-Modified-Since": prev_timestamp}
-            conn = urllib.request.Request(self.url, headers=headers)
+            conn = urllib.request.Request(self.onionoo_url, headers=headers)
         else:
-            conn = urllib.request.Request(self.url)
+            conn = urllib.request.Request(self.onionoo_url)
 
         api_response = urllib.request.urlopen(conn).read()
 
@@ -186,9 +185,9 @@ class Relays:
 
     def create_output_dir(self):
         '''
-        Ensure config:output_root exists (required for write functions)
+        Ensure self.output_dir exists (required for write functions)
         '''
-        os.makedirs(config.CONFIG['output_root'],exist_ok=True)
+        os.makedirs(self.output_dir,exist_ok=True)
 
     def write_misc(self, template, path, path_prefix='../', sorted_by=None,
             reverse=True, is_index=False):
@@ -212,7 +211,7 @@ class Relays:
             is_index    = is_index,
             path_prefix = path_prefix
         )
-        output = os.path.join(config.CONFIG['output_root'], path)
+        output = os.path.join(self.output_dir, path)
         os.makedirs(os.path.dirname(output), exist_ok=True)
 
         with open(output, 'w', encoding='utf8') as html:
@@ -226,7 +225,29 @@ class Relays:
             k: onionoo key to sort by (as, country, platform...)
         '''
         template = ENV.get_template(k + '.html')
-        output_path = os.path.join(config.CONFIG['output_root'], k)
+        output_path = os.path.join(self.output_dir, k)
+
+        # the "royal the" must be gramatically recognized
+        the_prefixed = [
+            "Dominican Republic",
+            "Ivory Coast",
+            "Marshall Islands",
+            "Northern Marianas Islands",
+            "Solomon Islands",
+            "United Arab Emirates",
+            "United Kingdom",
+            "United States",
+            "United States of America",
+            "Vatican City",
+            "Czech Republic",
+            "Bahamas",
+            "Gambia",
+            "Netherlands",
+            "Philippines",
+            "Seychelles",
+            "Sudan",
+            "Ukraine"
+        ]
 
         if os.path.exists(output_path):
             rmtree(output_path)
@@ -253,7 +274,7 @@ class Relays:
                 path_prefix  = '../../',
                 key          = k,
                 value        = v,
-                sp_countries = countries.THE_PREFIXED
+                sp_countries = the_prefixed
             )
 
             with open(os.path.join(dir_path, 'index.html'), 'w',
@@ -266,7 +287,7 @@ class Relays:
         '''
         relay_list = self.json['relays']
         template = ENV.get_template('relay-info.html')
-        output_path = os.path.join(config.CONFIG['output_root'], 'relay')
+        output_path = os.path.join(self.output_dir, 'relay')
 
         if os.path.exists(output_path):
             rmtree(output_path)
