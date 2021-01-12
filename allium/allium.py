@@ -27,11 +27,11 @@ ABS_PATH = os.path.dirname(os.path.abspath(__file__))
 if __name__ == '__main__':
     desc = 'allium: generate static tor relay metrics and statistics'
     parser = argparse.ArgumentParser(description=desc)
-    parser.add_argument('--out', dest='output_dir', action='store_true',
+    parser.add_argument('--out', dest='output_dir', type=str,
                         default="./www",
                         help='directory to store rendered files (default "./www")',
                         required=False)
-    parser.add_argument('--onionoo-url', dest='onionoo_url', action='store_true',
+    parser.add_argument('--onionoo-url', dest='onionoo_url', type=str,
                         default="https://onionoo.torproject.org/details",
                         help='onionoo HTTP URL (default '\
                              '"https://onionoo.torproject.org/details")',
