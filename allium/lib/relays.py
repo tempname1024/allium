@@ -141,12 +141,12 @@ class Relays():
         else:
             self.json['sorted'][k][v]['middle_count'] += 1
 
-        if k is 'as':
+        if k == 'as':
             self.json['sorted'][k][v]['country'] = relay.get('country')
             self.json['sorted'][k][v]['country_name'] = relay.get('country')
             self.json['sorted'][k][v]['as_name'] = relay.get('as_name')
 
-        if k is 'family':
+        if k == 'family':
             self.json['sorted'][k][v]['contact'] = relay.get('contact')
             self.json['sorted'][k][v]['contact_md5'] = relay.get('contact_md5')
 
@@ -258,7 +258,7 @@ class Relays():
 
             for m_relay in i['relays']:
                 members.append(self.json['relays'][m_relay])
-            if k is 'flag':
+            if k == 'flag':
                 dir_path = os.path.join(output_path, v.lower())
             else:
                 dir_path = os.path.join(output_path, v)
