@@ -40,6 +40,9 @@ if __name__ == '__main__':
 
     # object containing onionoo data and processing routines
     RELAY_SET = Relays(args.output_dir, args.onionoo_url)
+    if RELAY_SET.json == None:
+        sys.exit(0)
+
     RELAY_SET.create_output_dir()
 
     # index and "all" HTML relay sets; index set limited to 500 relays

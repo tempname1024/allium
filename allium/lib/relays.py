@@ -27,6 +27,8 @@ class Relays():
         self.onionoo_url = onionoo_url
         self.ts_file = os.path.join(os.path.dirname(ABS_PATH), "timestamp")
         self.json = self._fetch_onionoo_details()
+        if self.json == None:
+            return
         self.timestamp = self._write_timestamp()
 
         self._fix_missing_observed_bandwidth()
@@ -48,7 +50,14 @@ class Relays():
         else:
             conn = urllib.request.Request(self.onionoo_url)
 
-        api_response = urllib.request.urlopen(conn).read()
+        try:
+            api_response = urllib.request.urlopen(conn).read()
+        except urllib.error.HTTPError as err:
+            if err.code == 304:
+                print("no onionoo update since last run, dying peacefully...")
+                return
+            else:
+                raise(err)
 
         return json.loads(api_response.decode('utf-8'))
 
