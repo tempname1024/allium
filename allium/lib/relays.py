@@ -69,7 +69,7 @@ class Relays():
         e.g. "Tor 0.3.4.9 on Linux" -> "Linux"
         '''
         for relay in self.json['relays']:
-            relay['platform'] = relay['platform'].split(' on ', 1)[1].split(' ')[0]
+            relay['platform'] = relay.get('platform').split(' on ', 1)[1].split(' ')[0]
             relay['platform'] = relay['platform'].split('/')[-1] # GNU/*
 
     def _fix_missing_observed_bandwidth(self):
