@@ -1,128 +1,162 @@
 {% extends "skeleton.html" -%}
-{% block title -%}Tor Relays{% endblock -%}
-{% block body -%}
-<h2>{% block header -%}{% endblock -%}</h2>
-<p>{% block description -%}{% endblock -%}</p>
-<table class="table table-condensed">
-<tr>
-<th></th>
-<th>Nickname</th>
-<th>Contact</th>
-<th>Bandwidth</th>
-<th class="visible-md visible-lg">IP Address</th>
-<th>AS Number</th>
-<th>AS Name</th>
-<th>Country</th>
-<th>Platform</th>
-<th class="visible-md visible-lg">Flags</th>
-<th class="visible-md visible-lg">First Seen</th>
-</tr>
-<tbody>
-{% if is_index -%}{% set relay_list = relays.json['relay_subset'][:500] -%}
-{% else -%}{% set relay_list = relays.json['relay_subset'] -%}{% endif -%}
-{% for relay in relay_list -%}
-<tr>
-{% if relay['observed_bandwidth'] > 1000000 -%}
-{% set obs_bandwidth = '%s %s'|format((relay['observed_bandwidth']
-/ 1000000)|round(2, 'common'), 'MB/s') -%}
-{% else -%}
-{% set obs_bandwidth = '%s %s'|format((relay['observed_bandwidth'] / 1000)|
-round(2, 'common'), 'KB/s') -%}{% endif -%}
-
-{% if relay['running'] -%}
-<td><span class="circle circle-online" title="This relay is online"></span></td>
-{% else -%}
-<td><span class="circle circle-offline" title="This relay is offline"></span>
-</td>
-{% endif -%}
-
-{% if relay['effective_family']|length > 1 -%}
-<td title="{{ relay['nickname']|escape }}"><a href="{{ path_prefix }}relay/{{
-relay['fingerprint']|escape }}.html">{{ relay['nickname']|truncate(8)|escape
-}}</a> (<a href="{{ path_prefix }}family/{{ relay['fingerprint']|escape }}/">{{
-relay['effective_family']| length }}</a>)</td>
-{% else -%}
-<td title="{{ relay['nickname']|escape }}"><a href="{{ path_prefix}}relay/{{
-relay['fingerprint']|escape }}.html">{{ relay['nickname']|truncate(10)|escape
-}}</a></td>
-{% endif -%}
-
-{% if key != 'contact' -%}
-{% if relay['contact'] -%}
-<td><code><a href="{{ path_prefix }}contact/{{ relay['contact_md5'] }}/"
-title="{{ relay['contact']|escape }}">{{ relay['contact_md5'][0:8]
-}}</a></code></td>
-{% else -%}
-<td title="none"><code>none</code></td>
-{% endif -%}
-{% else -%}
-<td title="{{ relay['contact']|escape }}"><code>{{ relay['contact_md5'][0:8]
-}}</code></td>
-{% endif -%}
-
-<td>{{ obs_bandwidth }}</td>
-
-<td class="visible-md visible-lg"><a href="https://bgp.he.net/ip/{{
-relay['or_addresses'][0].split(':', 1)[0]|escape }}">{{
-relay['or_addresses'][0].split(':', 1)[0]|escape }}</a></td>
-
-{% if relay['as'] -%}
-{% if key != 'as' -%}
-<td><a href="{{ path_prefix }}as/{{ relay['as']|escape }}/">{{
-relay['as']|escape }}</a></td>
-{% else -%}
-<td>{{ relay['as']|escape }}</td>
-{% endif -%}
-{% else -%}
-<td>Unknown</td>
-{% endif -%}
-
-{% if relay['as_name'] -%}
-<td><a href="https://bgp.he.net/{{ relay['as']|escape }}" title="{{
-relay['as_name']|escape }}">{{
-relay['as_name']|escape|truncate(length=20) }}</a></td>
-{% else -%}
-<td>Unknown</td>
-{% endif -%}
-
-{% if relay['country'] -%}
-{% if key != 'country' -%}
-<td><a href="{{ path_prefix }}country/{{ relay['country']|escape }}/"><img
-src="{{ path_prefix }}static/images/cc/{{ relay['country']|escape
-}}.png" title="{{ relay['country_name']|escape }}" alt="{{
-relay['country_name']|escape }}"></a></td>
-{% else -%}
-<td><img src="{{ path_prefix }}static/images/cc/{{ relay['country']|escape
-}}.png" title="{{ relay['country_name']|escape }}" alt="{{
-relay['country_name']|escape }}"></td>
-{% endif -%}
-{% else -%}
-<td>X</td>
-{% endif -%}
-
-{% if key != 'platform' -%}
-<td><a href="{{ path_prefix }}platform/{{ relay['platform']|escape }}/">{{
-relay['platform']|truncate(length=10)|escape }}</a></td>
-{% else -%}
-<td>{{ relay['platform']|truncate(length=10)|escape }}</td>
-{% endif -%}
-
-<td class="visible-md visible-lg">{% for flag in relay['flags'] -%}{% if flag != 'StaleDesc' -%}<a href="{{
-path_prefix }}flag/{{ flag.lower()|escape }}"><img src="{{
-path_prefix}}static/images/flags/{{ flag.lower()|escape }}.png"
-title="{{ flag|escape }}" alt="{{ flag|escape }}"></a> {% endif -%}{% endfor
--%}</td>
-
-{% if key != 'first_seen' -%}
-<td class="visible-md visible-lg"><a href="{{ path_prefix }}first_seen/{{
-relay['first_seen'].split(' ', 1)[0]|escape }}">{{
-relay['first_seen'].split(' ', 1)[0]|escape }}</a></td>
-{% else -%}
-<td class="visible-md visible-lg">{{ relay['first_seen'].split(' ', 1)[0]|escape
-}}</td>
-{% endif -%}
-</tr>
-{% endfor -%}
-</tbody>
-</table>
+{% block title -%}
+    Tor Relays
 {% endblock -%}
+{% block body -%}
+    <h2>
+        {% block header -%}
+        {% endblock -%}
+    </h2>
+    <p>
+        {% block description -%}
+        {% endblock -%}
+    </p>
+    <table class="table table-condensed">
+        <tr>
+            <th></th>
+            <th>Nickname</th>
+            <th>Contact</th>
+            <th>Bandwidth</th>
+            <th class="visible-md visible-lg">IP Address</th>
+            <th>AS Number</th>
+            <th>AS Name</th>
+            <th>Country</th>
+            <th>Platform</th>
+            <th class="visible-md visible-lg">Flags</th>
+            <th class="visible-md visible-lg">First Seen</th>
+        </tr>
+        <tbody>
+            {% if is_index -%}
+                {% set relay_list = relays.json['relay_subset'][:500] -%}
+            {% else -%}
+                {% set relay_list = relays.json['relay_subset'] -%}
+            {% endif -%}
+            {% for relay in relay_list -%}
+                <tr>
+                    {% if relay['observed_bandwidth'] > 1000000 -%}
+                        {% set obs_bandwidth = '%s %s'|format((relay['observed_bandwidth']
+                        / 1000000)|round(2, 'common'), 'MB/s') -%}
+                    {% else -%}
+                        {% set obs_bandwidth = '%s %s'|format((relay['observed_bandwidth'] / 1000)|
+                        round(2, 'common'), 'KB/s') -%}
+                    {% endif -%}
+                    {% if relay['running'] -%}
+                        <td>
+                            <span class="circle circle-online" title="This relay is online"></span>
+                        </td>
+                    {% else -%}
+                        <td>
+                            <span class="circle circle-offline" title="This relay is offline"></span>
+                        </td>
+                    {% endif -%}
+                    {% if relay['effective_family']|length > 1 -%}
+                        <td title="{{ relay['nickname']|escape }}">
+                            <a href="{{ path_prefix }}relay/{{ relay['fingerprint']|escape }}.html">{{ relay['nickname']|truncate(8)|escape
+                                }}</a> (<a href="{{ path_prefix }}family/{{ relay['fingerprint']|escape }}/">{{
+                                relay['effective_family']| length }}</a>)
+                            </td>
+                        {% else -%}
+                            <td title="{{ relay['nickname']|escape }}">
+                                <a href="{{ path_prefix }}relay/{{ relay['fingerprint']|escape }}.html">{{ relay['nickname']|truncate(10)|escape
+                                }}</a>
+                            </td>
+                        {% endif -%}
+                        {% if key != 'contact' -%}
+                            {% if relay['contact'] -%}
+                                <td>
+                                    <code><a href="{{ path_prefix }}contact/{{ relay['contact_md5'] }}/"
+   title="{{ relay['contact']|escape }}">{{ relay['contact_md5'][0:8]
+                                    }}</a></code>
+                                </td>
+                            {% else -%}
+                                <td title="none">
+                                    <code>none</code>
+                                </td>
+                            {% endif -%}
+                        {% else -%}
+                            <td title="{{ relay['contact']|escape }}">
+                                <code>{{ relay['contact_md5'][0:8]
+                                }}</code>
+                            </td>
+                        {% endif -%}
+                        <td>{{ obs_bandwidth }}</td>
+                        <td class="visible-md visible-lg">
+                            <a href="https://bgp.he.net/ip/{{ relay['or_addresses'][0].split(':', 1)[0]|escape }}">{{
+                            relay['or_addresses'][0].split(':', 1)[0]|escape }}</a>
+                        </td>
+                        {% if relay['as'] -%}
+                            {% if key != 'as' -%}
+                                <td>
+                                    <a href="{{ path_prefix }}as/{{ relay['as']|escape }}/">{{
+                                    relay['as']|escape }}</a>
+                                </td>
+                            {% else -%}
+                                <td>{{ relay['as']|escape }}</td>
+                            {% endif -%}
+                        {% else -%}
+                            <td>Unknown</td>
+                        {% endif -%}
+                        {% if relay['as_name'] -%}
+                            <td>
+                                <a href="https://bgp.he.net/{{ relay['as']|escape }}"
+                                   title="{{ relay['as_name']|escape }}">{{
+                                relay['as_name']|escape|truncate(length=20) }}</a>
+                            </td>
+                        {% else -%}
+                            <td>Unknown</td>
+                        {% endif -%}
+                        {% if relay['country'] -%}
+                            {% if key != 'country' -%}
+                                <td>
+                                    <a href="{{ path_prefix }}country/{{ relay['country']|escape }}/">
+                                        <img src="{{ path_prefix }}static/images/cc/{{ relay['country']|escape }}.png"
+                                             title="{{ relay['country_name']|escape }}"
+                                             alt="{{ relay['country_name']|escape }}">
+                                    </a>
+                                </td>
+                            {% else -%}
+                                <td>
+                                    <img src="{{ path_prefix }}static/images/cc/{{ relay['country']|escape }}.png"
+                                         title="{{ relay['country_name']|escape }}"
+                                         alt="{{ relay['country_name']|escape }}">
+                                </td>
+                            {% endif -%}
+                        {% else -%}
+                            <td>X</td>
+                        {% endif -%}
+                        {% if key != 'platform' -%}
+                            <td>
+                                <a href="{{ path_prefix }}platform/{{ relay['platform']|escape }}/">{{
+                                relay['platform']|truncate(length=10)|escape }}</a>
+                            </td>
+                        {% else -%}
+                            <td>{{ relay['platform']|truncate(length=10)|escape }}</td>
+                        {% endif -%}
+                        <td class="visible-md visible-lg">
+                            {% for flag in relay['flags'] -%}
+                                {% if flag != 'StaleDesc' -%}
+                                    <a href="{{ path_prefix }}flag/{{ flag.lower()|escape }}">
+                                        <img src="{{ path_prefix }}static/images/flags/{{ flag.lower()|escape }}.png"
+                                             title="{{ flag|escape }}"
+                                             alt="{{ flag|escape }}">
+                                    </a>
+                                {% endif -%}
+                            {% endfor
+                            -%}
+                        </td>
+                        {% if key != 'first_seen' -%}
+                            <td class="visible-md visible-lg">
+                                <a href="{{ path_prefix }}first_seen/{{ relay['first_seen'].split(' ', 1)[0]|escape }}">{{
+                                relay['first_seen'].split(' ', 1)[0]|escape }}</a>
+                            </td>
+                        {% else -%}
+                            <td class="visible-md visible-lg">
+                                {{ relay['first_seen'].split(' ', 1)[0]|escape
+                                }}
+                            </td>
+                        {% endif -%}
+                    </tr>
+                {% endfor -%}
+            </tbody>
+        </table>
+    {% endblock -%}

@@ -8,8 +8,19 @@
 {% endif %}
 {% block title %}Tor Relays :: {{ country_orig }}{% endblock %}
 {% block header %}<a href="../../">Home</a> :: {{ country_name }}{% endblock %}
-{% block description %}{{ country_name }} ({{ country_abbr }}) is responsible
-for ~{{ bandwidth }} MB/s of traffic, with {% if middle_count > 0 %}{{
-middle_count }} middle relay{% if middle_count > 1 %}s{% endif %}{% if
-exit_count > 0 %} and {% endif %}{% endif %}{% if exit_count > 0 %}{{ exit_count
-}} exit relay{% if exit_count > 1 %}s{% endif %}{% endif %}.{% endblock %}
+{% block description %}
+    {{ country_name }} ({{ country_abbr }}) is responsible
+    for ~{{ bandwidth }} MB/s of traffic, with
+    {% if middle_count > 0 %}
+        {{ middle_count }} middle relay
+        {%- if middle_count > 1 -%}s{%- endif -%}
+        {% if exit_count > 0 %}
+            and
+        {% endif %}
+    {% endif %}
+    {% if exit_count > 0 %}
+        {{ exit_count }} exit relay
+        {%- if exit_count > 1 -%}s{%- endif -%}
+    {%- endif -%}
+    .
+{% endblock %}

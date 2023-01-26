@@ -1,8 +1,21 @@
 {% extends "relay-list.html" %}
 {% block title %}Tor Relays :: {{ value }}{% endblock %}
 {% block header %}<a href="../../">Home</a> :: {{ value }}{% endblock %}
-{% block description %}Relays started on {{ value }} are responsible for ~{{
-bandwidth }} MB/s of traffic, with {% if middle_count > 0 %}{{ middle_count }}
-middle relay{% if middle_count > 1 %}s{% endif %}{% if exit_count > 0 %} and {%
-endif %}{% endif %}{% if exit_count > 0 %}{{ exit_count }} exit relay{% if
-exit_count > 1 %}s{% endif %}{% endif %}.{% endblock %}
+{% block description %}
+    Relays started on {{ value }} are responsible for ~{{
+    bandwidth }} MB/s of traffic, with
+    {% if middle_count > 0 %}
+        {{ middle_count }}
+        middle relay
+        {%- if middle_count > 1 -%}s{%- endif %}
+        {% if exit_count > 0 %}
+            and {% endif %}
+    {% endif %}
+    {% if exit_count > 0 %}
+        {{ exit_count }} exit relay
+        {%- if exit_count > 1 -%}
+            s
+        {%- endif -%}
+    {%- endif -%}
+    .
+{% endblock %}

@@ -1,79 +1,90 @@
 {% extends "skeleton.html" -%}
 {% set sorted_by_label = sorted_by.split(',')[0].split('.')[1] -%}
-{% block title -%}Tor Relays :: Families By {{ sorted_by_label|replace('_',
-' ')|title }}{% endblock -%}
+{% block title -%}
+    Tor Relays :: Families By {{ sorted_by_label|replace('_',
+    ' ')|title }}
+{% endblock -%}
 {% block body -%}
-<h2><a href={{ path_prefix }}>Home</a> :: Families By {{
-sorted_by_label|replace('_', ' ')|title }}</h2>
-<p>The set of all relay families with > 1 effective members, sorted by {{
-sorted_by_label|replace('_', ' ') }}. The first seen parameter is taken from the
-oldest relay in the family.</p>
-<table class="table table-condensed">
-<tr>
-<th>Family</th>
-
-{% if sorted_by_label == 'bandwidth' -%}
-<th>Bandwidth</th>
-{% else -%}
-<th><a href="families-by-bandwidth.html">Bandwidth</a></th>
-{% endif -%}
-
-<th class="visible-md visible-lg">Contact</th>
-
-{% if sorted_by_label == 'exit_count' -%}
-<th>Exit / <a href="families-by-middle-count.html">Middle</a></th>
-{% elif sorted_by_label == 'middle_count' -%}
-<th><a href="families-by-exit-count.html">Exit</a> / Middle</th>
-{% else -%}
-<th><a href="families-by-exit-count.html">Exit</a> / <a
-href="families-by-middle-count.html">Middle</a></th>
-{% endif -%}
-
-{% if sorted_by_label == 'first_seen' -%}
-<th>First Seen</th>
-{% else -%}
-<th><a href="families-by-first-seen.html">First Seen</a></th>
-{% endif -%}
-</tr>
-
-<tbody>
-{% set processed = dict() -%}
-{% for k, v in relays.json['sorted']['family'].items()|sort(attribute=sorted_by,
-reverse=True) -%}
-{% if relays.json['relays'][v['relays'][0]]['fingerprint'] not in processed -%}
-<tr>
-{% if v['bandwidth'] > 1000000 -%}
-{% set obs_bandwidth = '%s %s'|format((v['bandwidth'] / 1000000)|round(2,
-'common'), 'MB/s') -%}
-{% else -%}
-{% set obs_bandwidth = '%s %s'|format((v['bandwidth'] / 1000)|round(2,
-'common'), 'KB/s') -%}{% endif -%}
-
-<td><code><a href="{{ path_prefix}}family/{{ k|escape }}/">{{ k|escape
-}}</a></code></td>
-
-<td>{{ obs_bandwidth }}</td>
-
-{% if v['contact'] -%}
-<td class="visible-md visible-lg"><code><a href="{{ path_prefix }}contact/{{
-v['contact_md5'] }}/" title="{{ v['contact']|escape }}">{{
-v['contact']|truncate(50)|escape }}<a></td></code>
-{% else -%}
-<td class="visible-md visible-lg">none</td>
-{% endif -%}
-
-<td>{{ v['exit_count'] }} / {{ v['middle_count'] }}</td>
-
-<td><a href="{{ path_prefix }}first_seen/{{ v['first_seen'].split(' ',
-1)[0]|escape }}">{{ v['first_seen'].split(' ', 1)[0]|escape }}</a></td>
-
-{% for r in v['relays'] -%}
-{% set _dummy = processed.update({relays.json['relay_subset'][r]['fingerprint']:
-None}) -%}
-{% endfor -%}
-</tr>
-{% endif -%}
-{% endfor -%}
-</tbody>
-</table>
+    <h2>
+        <a href={{ path_prefix }}>Home</a> :: Families By {{
+        sorted_by_label|replace('_', ' ')|title }}
+    </h2>
+    <p>
+        The set of all relay families with > 1 effective members, sorted by {{
+        sorted_by_label|replace('_', ' ') }}. The first seen parameter is taken from the
+        oldest relay in the family.
+    </p>
+    <table class="table table-condensed">
+        <tr>
+            <th>Family</th>
+            {% if sorted_by_label == 'bandwidth' -%}
+                <th>Bandwidth</th>
+            {% else -%}
+                <th>
+                    <a href="families-by-bandwidth.html">Bandwidth</a>
+                </th>
+            {% endif -%}
+            <th class="visible-md visible-lg">Contact</th>
+            {% if sorted_by_label == 'exit_count' -%}
+                <th>
+                    Exit / <a href="families-by-middle-count.html">Middle</a>
+                </th>
+            {% elif sorted_by_label == 'middle_count' -%}
+                <th>
+                    <a href="families-by-exit-count.html">Exit</a> / Middle
+                </th>
+            {% else -%}
+                <th>
+                    <a href="families-by-exit-count.html">Exit</a> / <a href="families-by-middle-count.html">Middle</a>
+                </th>
+            {% endif -%}
+            {% if sorted_by_label == 'first_seen' -%}
+                <th>First Seen</th>
+            {% else -%}
+                <th>
+                    <a href="families-by-first-seen.html">First Seen</a>
+                </th>
+            {% endif -%}
+        </tr>
+        <tbody>
+            {% set processed = dict() -%}
+            {% for k, v in relays.json['sorted']['family'].items()|sort(attribute=sorted_by,
+                reverse=True) -%}
+                {% if relays.json['relays'][v['relays'][0]]['fingerprint'] not in processed -%}
+                    <tr>
+                        {% if v['bandwidth'] > 1000000 -%}
+                            {% set obs_bandwidth = '%s %s'|format((v['bandwidth'] / 1000000)|round(2,
+                            'common'), 'MB/s') -%}
+                        {% else -%}
+                            {% set obs_bandwidth = '%s %s'|format((v['bandwidth'] / 1000)|round(2,
+                            'common'), 'KB/s') -%}
+                        {% endif -%}
+                        <td>
+                            <code><a href="{{ path_prefix }}family/{{ k|escape }}/">{{ k|escape
+                            }}</a></code>
+                        </td>
+                        <td>{{ obs_bandwidth }}</td>
+                        {% if v['contact'] -%}
+                            <td class="visible-md visible-lg">
+                                <code><a href="{{ path_prefix }}contact/{{ v['contact_md5'] }}/"
+   title="{{ v['contact']|escape }}">{{
+                                    v['contact']|truncate(50)|escape }}<a>
+                                </td>
+                            </code>
+                        {% else -%}
+                            <td class="visible-md visible-lg">none</td>
+                        {% endif -%}
+                        <td>{{ v['exit_count'] }} / {{ v['middle_count'] }}</td>
+                        <td>
+                            <a href="{{ path_prefix }}first_seen/{{ v['first_seen'].split(' ', 1)[0]|escape }}">{{ v['first_seen'].split(' ', 1)[0]|escape }}</a>
+                        </td>
+                        {% for r in v['relays'] -%}
+                            {% set _dummy = processed.update({relays.json['relay_subset'][r]['fingerprint']:
+                            None}) -%}
+                        {% endfor -%}
+                    </tr>
+                {% endif -%}
+            {% endfor -%}
+        </tbody>
+    </table>
 {% endblock -%}
